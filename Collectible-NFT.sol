@@ -1,15 +1,16 @@
+// SPDX-License-Identifier: MIT
+
 // Version 16.02 A 
 // Basic ERC20 Token as Payment
 
-pragma solidity 0.5.3;
+pragma solidity ^0.8.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.3.0/contracts/token/ERC721/ERC721Full.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.3.0/contracts/math/SafeMath.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/67bdad4ca537f0da301cf7d554cb12916f94b9de/contracts/drafts/Strings.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.3.0/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 
-contract NekoCollectibles is  ERC721Full {
+contract NekoCollectibles is  ERC721 {
     using SafeMath for uint256;
     /**
      * Struct Clevel for authorize person to execute some restricted functions
@@ -46,7 +47,6 @@ contract NekoCollectibles is  ERC721Full {
      * List of existing CLevel
      * List of exisiting Neko
      * 
-     * @manekiPool funds use to maneki distibutions
      */
 
     CLevel[] public CLevels;
@@ -59,15 +59,13 @@ contract NekoCollectibles is  ERC721Full {
      *
      */
 
-    constructor() ERC721Full("Neko Collectibles", "MANEKI") public {
-
-        
+    constructor() ERC721("Neko Collectibles", "MANEKI") public {
         CLevel memory newCLevel = CLevel({
             CLevelAddress : msg.sender,
             Role : 1,
             Status : true
         });
-        CLevels.push(newCLevel).sub(1);
+        CLevels.push(newCLevel);
 
     }
 
@@ -123,9 +121,6 @@ contract NekoCollectibles is  ERC721Full {
     event BONUS (address indexed payee, uint256 gammaNekoID, uint256 amount, uint256 timestamp);
     event ROLES (address user, uint256 role, bool status);
 
-    // Fallback function
-    function() external payable {
-    }
 
     function addNewCEO (address _newAddress) external onlyCEO{
         CLevel memory newCLevel = CLevel({
@@ -133,7 +128,7 @@ contract NekoCollectibles is  ERC721Full {
             Role : 1,
             Status : true
         });
-        CLevels.push(newCLevel).sub(1);
+        CLevels.push(newCLevel);
         emit ROLES (_newAddress,1,true);
     }
 
@@ -143,7 +138,7 @@ contract NekoCollectibles is  ERC721Full {
             Role : 2,
             Status : true
         });
-        CLevels.push(newCLevel).sub(1);
+        CLevels.push(newCLevel);
         emit ROLES (_newAddress,2,true);
     }
 
@@ -217,17 +212,8 @@ contract NekoCollectibles is  ERC721Full {
     
     function mintLuckyNeko(uint256 _machine, uint256 _refNekoId) external payable returns (bool) {
         
-        //require(msg.value ==  0.1 ether);
-        // price x 18 decimals
-        // uint256 Price = 100*10 ** 18;
-        // uint256 Price = 100;
-        
-        
-        /* transfer 100 $NEKO to Platfrom wallet 
-         * 0x4F6397625F7D14031f7C1331947666E308D575CD
-        */
-        
-        
+        require(msg.value ==  0.1 ether);
+ 
         uint256 DNA;
         uint256 manekiPower;
         uint256 generation;
@@ -364,8 +350,8 @@ contract NekoCollectibles is  ERC721Full {
             gammaNekoID : _gammaNekoID
         });
 
-
-        uint256 newNekoId = Nekos.push(newNeko).sub(1);
+        Nekos.push(newNeko);
+        uint256 newNekoId = Nekos.length-1;
         super._mint(_owner, newNekoId);
 
         emit BIRTH (_owner,newNekoId, newNeko.power, newNeko.DNA);
@@ -436,14 +422,14 @@ contract NekoCollectibles is  ERC721Full {
 
     function luckyCoin() internal returns(bool){
         address payable luckyWallet;
+        address payable ownerWallet;
+        
         uint256[] memory _nekoId = new uint256[](10);
         uint256[] memory _nekoPower = new uint256[](10);
         uint256 _sumPower = 0;
         uint256 _coins = 1000000000000;
 
-
         uint256 _amount;
-        address ownerWallet;
 
         uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty)));
         uint256 factor = 1;
@@ -451,7 +437,7 @@ contract NekoCollectibles is  ERC721Full {
         for (uint i = 0; i < 10; i++) {
 
           factor = factor.mul(10);
-          _nekoId[i] = random.div(factor).mod(totalSupply());
+          _nekoId[i] = random.div(factor).mod(Nekos.length);
 
           Neko storage NEKO = Nekos[_nekoId[i]];
           _nekoPower[i] = NEKO.power;
@@ -462,8 +448,8 @@ contract NekoCollectibles is  ERC721Full {
 
         for (uint j = 0; j < 10; j++) {
 
-          ownerWallet = ownerOf(_nekoId[j]);
-          luckyWallet = address(uint160(ownerWallet));
+          ownerWallet = payable(ownerOf(_nekoId[j]));
+          luckyWallet = ownerWallet;
 
           _nekoPower[j] = _nekoPower[j].mul(10000);
 
@@ -489,13 +475,19 @@ contract NekoCollectibles is  ERC721Full {
         if(balanceOf(ownerOf(_refNekoId))>=10){
             address payable _payee;
             uint256 _amount = 18000000000000000;
-            _payee = address(uint160(ownerOf(_refNekoId)));
+            _payee = payable(ownerOf(_refNekoId));
             _payee.transfer(_amount);
 
             emit INCENTIVE (_payee, _refNekoId, _amount, block.timestamp);
+            return true;
         }
+        return false;
     }
-
+    
+    function totalSupply() external view returns (uint){
+        return Nekos.length;
+    }
+    
     /**
      * if the referred from a Gamma Neko
      * Gamma collector eligible to get 0.01 ETH Bonus for each referral
@@ -504,10 +496,11 @@ contract NekoCollectibles is  ERC721Full {
     function gammaCollectorBonus(uint256 _GammaNekoID) internal returns(bool){
             address payable _payee;
             uint256 _amount = 10000000000000000;
-            _payee = address(uint160(ownerOf(_GammaNekoID)));
+            _payee = payable(ownerOf(_GammaNekoID));
             _payee.transfer(_amount);
 
             emit BONUS (_payee, _GammaNekoID, _amount, block.timestamp);
+            return true;
     }
 
 
