@@ -258,8 +258,7 @@ contract NekoCollectibles is  ERC721 {
         return true;
     }
 
-
-    function mintCollectible (address _buyer, uint256 _machine, uint256 _refNekoId) external payable returns (bool){
+    function mintCollectible (address _buyer, uint256 _machine, uint256 _refNekoId) public virtual returns (bool){
         
         //require(msg.value ==  0.1 ether);
         // price x 18 decimals
