@@ -1,0 +1,65 @@
+@font-face {
+  font-family: "iconfont"; /* Project id  */
+  src: url('iconfont.ttf?t=1623035677571') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-iconwallet:before {
+  content: "\e654";
+}
+
+.icon-home:before {
+  content: "\e617";
+}
+
+.icon-contact:before {
+  content: "\e642";
+}
+
+.icon-telegram:before {
+  content: "\eaf9";
+}
+
+.icon-icon_twitter:before {
+  content: "\e630";
+}
+
+.icon-user:before {
+  content: "\e645";
+}
+
+.icon-graph_rise:before {
+  content: "\e65f";
+}
+
+.icon-launch:before {
+  content: "\e62d";
+}
+
+.icon-github:before {
+  content: "\e811";
+}
+
+.icon-dollar:before {
+  content: "\e74c";
+}
+
+.icon-exchange:before {
+  content: "\e651";
+}
+
+.icon-lock:before {
+  content: "\e628";
+}
+
+.icon-medium-circle-fill:before {
+  content: "\eabb";
+}
+
