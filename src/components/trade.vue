@@ -1,5 +1,11 @@
 <template>
     <div class="sales_container">
+
+      <div> Decenterlized NFT Trading 
+      NFTs Valuation 
+      Select NFT > Payment Method > Buy
+      Select NFT > Set a price > Sell
+      </div>
         <div class="sales_box">
         <el-form :model="loginForm" class="sales_form">
             <el-form-item prop="price" class="login_item">

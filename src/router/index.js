@@ -3,15 +3,18 @@ import VueRouter from 'vue-router'
 import Login from '../components/login.vue'
 import Home from '../components/home.vue'
 import Welcome from '../components/welcome.vue'
+import Wallet from '../components/wallet.vue'
 import Trade from '../components/trade.vue'
 import Launchpad from '../components/launchpad.vue'
-import Wallet from '../components/wallet.vue'
+import Manekineko from '../components/manekineko.vue'
+import Analytics from '../components/analytics.vue'
+import Contact from '../components/contact.vue'
 
 
 Vue.use(VueRouter)
 
 const routes = [
-  {path: '/', redirect:'/login'},
+  {path: '/', redirect:'/home'},
   {path: '/login', component:Login },
   {path: '/home', component:Home,
     redirect :'/welcome', 
@@ -19,7 +22,10 @@ const routes = [
       {path: '/welcome', component:Welcome },
       {path: '/wallet', component:Wallet },
       {path: '/trade', component:Trade },
-      {path: '/launchpad', component:Launchpad }
+      {path: '/launchpad', component:Launchpad },
+      {path: '/manekineko', component:Manekineko },
+      {path: '/analytics', component:Analytics },
+      {path: '/contact', component:Contact }
     ]
   }
   

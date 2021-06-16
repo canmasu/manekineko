@@ -31,17 +31,17 @@
                 </el-menu-item>
 
 
-                <el-menu-item index="4">
+                <el-menu-item index="manekineko">
                     <i class="iconfont icon-dollar"></i>
                     <span slot="title">Manaki-neko</span>
                 </el-menu-item>
 
-                <el-menu-item index="5">
+                <el-menu-item index="analytics">
                     <i class="iconfont icon-graph_rise"></i>
                     <span slot="title">Analytics</span>
                 </el-menu-item>
 
-                <el-submenu index="5">
+                <el-submenu index="contact">
                     <template slot="title">
                         <i class="iconfont icon-contact"></i>
                         <span slot="title">Contact</span>
@@ -67,14 +67,13 @@
 
 <script>
 
-
-
 export default {
     data(){
         return{
             isCollapse:false
         }
     },
+
     methods : {
         toggle(){
             this.isCollapse = !this.isCollapse;

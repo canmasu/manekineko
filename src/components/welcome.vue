@@ -62,7 +62,7 @@
             </el-tag>
 
             <div class="price">$NEKO 9,898,283</div>
-            <el-progress :percentage="18" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="18"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -77,7 +77,7 @@
             <span>招き猫 # 681 第 97 世代</span>
             <div class="bottom clearfix">
             <div class="price">$CAKE 120.20 </div>
-            <el-progress :percentage="38" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="38"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -92,7 +92,7 @@
             <span>招き猫 # 677 第 97 世代</span>
             <div class="bottom clearfix">
             <div class="price">$BNB 1.2</div>
-            <el-progress :percentage="68" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="68"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -107,7 +107,7 @@
             <span>招き猫 # 637 第 97 世代</span>
             <div class="bottom clearfix">
             <div class="price">$NEKO 10,000,000</div>
-            <el-progress :percentage="86" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="86"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -123,7 +123,7 @@
             <span>招き猫 # 27 第 97 世代</span>
             <div class="bottom clearfix">
             <div class="price">$NEKO 9,898,283</div>
-            <el-progress :percentage="55" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="55"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -138,7 +138,7 @@
             <span>招き猫 # 81 第 97 世代</span>
             <div class="bottom clearfix">
             <div class="price">$CAKE 120.20 </div>
-            <el-progress :percentage="45" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="45"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -153,7 +153,7 @@
             <span>招き猫 # 617 第 97 世代</span>
             <div class="bottom clearfix">
             <div class="price">$BNB 1.2</div>
-            <el-progress :percentage="43" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="43"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -168,7 +168,7 @@
             <span>招き猫 # 537 第 97 世代</span>
             <div class="bottom clearfix">
             <div class="price">$NEKO 10,000,000</div>
-            <el-progress :percentage="57" :color="customColorMethod"></el-progress>
+            <el-progress :percentage="57"></el-progress>
             <el-button type="text" class="button">Buy</el-button>
             </div>
         </div>
@@ -179,14 +179,16 @@
 </template>
 
 <script>
+
+
 export default {
   data() {
     return {
-      currentDate: new Date(),
-      items: [
-          { type: '', label: 'Si Putih' },
-          { type: '', label: 'Money money come' }
-      ]
+        currentDate: new Date(),
+        items: [
+            { type: '', label: 'Si Putih' },
+            { type: '', label: 'Money money come' }
+        ]
     };
   }
 }
