@@ -1,15 +1,5 @@
 <template>
 <el-row>
-
-    <el-row>
-        <el-col :span="24">
-            <el-carousel :interval="5000" arrow="always">
-                <el-carousel-item v-for="item in 4" :key="item">
-                <h3>{{ item }}</h3>
-                </el-carousel-item>
-            </el-carousel>
-        </el-col>
-    </el-row>
     <el-row>
         <el-col :span="24">
             <h2> Last transcated </h2>
@@ -39,6 +29,17 @@
         </el-col>
     </el-row>
 
+
+    <el-row>
+        <el-col :span="24">
+            <el-carousel :interval="5000" arrow="always">
+                <el-carousel-item v-for="item in 4" :key="item">
+                <h3>{{ item }}</h3>
+                </el-carousel-item>
+            </el-carousel>
+        </el-col>
+    </el-row>
+    
     <el-row>
         <el-col :span="24">
             <h2> Sale </h2>
@@ -180,16 +181,78 @@
 
 <script>
 
+import NekoABI from '../web3/abi_neko';
+const contractAddress = '0xdF3CF86Faed8a1936F3dB48a374E981e3fFC3164';
+
+const Web3 = require('web3');
+const web3 = new Web3('https://data-seed-prebsc-1-s1.binance.org:8545');
+const contract = new web3.eth.Contract(NekoABI,contractAddress);
 
 export default {
   data() {
     return {
+        account :null,
+        contractInstance:null,
+        balance :0,
         currentDate: new Date(),
         items: [
             { type: '', label: 'Si Putih' },
             { type: '', label: 'Money money come' }
         ]
     };
+  },
+  mounted() {
+    // check metamask and request for installation
+    if(typeof window.ethereum !== 'undefined'){
+        console.log('Metamask is installed!');
+        this.getAccount();
+        this.connectBlockchain();
+    } else {
+        console.log('Please Install Metamask');
+    }
+  },
+  methods : {
+    async getAccount(){
+        await window.ethereum.request({method: 'eth_requestAccounts'}).then((res) => {
+            const accounts = res;
+            this.account = accounts[0];
+            console.log('inner asyn ',this.account);
+        }).catch((err) => {
+            console.log(err, 'err');
+        });
+
+        await window.ethereum.request({
+            method: 'eth_getBalance',
+            params: [this.account,"latest"],
+        }).then((res) => {
+            this.balance = parseInt(res)/10**18;
+            console.log('inner balance ',this.balance);
+        }).catch((err) => {
+            console.log(err, 'err');
+        });
+    }, 
+    async connectBlockchain (){
+        //test a Return value
+
+        await window.ethereum.request({method: 'eth_requestAccounts'}).then((res) => {
+            const accounts = res;
+            this.account = accounts[0];
+
+            console.log('wallet addrs :', this.account);
+            contract.methods.balanceOf(this.account).call().then((res) => {
+                console.log('async You $neko Bal :', res);
+            }).catch((err) => {
+                console.log(err, 'err');
+            });
+
+        }).catch((err) => {
+            console.log(err, 'err');
+        });
+
+
+
+    }
+
   }
 }
 </script>

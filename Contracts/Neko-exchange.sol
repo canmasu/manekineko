@@ -30,7 +30,7 @@ contract Exchange {
     event WITHDRAW   (address indexed _seller, uint256 _tokenID);
     event UPDATEPRICE(address indexed _seller, uint256 _tokenID, uint256 price);
 
-    function _sale (uint256 _tokenID, uint256 _Price) external returns (bool){
+    function sale (uint256 _tokenID, uint256 _Price) external returns (bool){
         Deal memory newDeal = Deal({
             Seller : msg.sender,
             TokenID  : _tokenID,
@@ -55,7 +55,7 @@ contract Exchange {
         NFTAddress.transferFrom(address(this),to,_tokenID);
     }
     
-    function _withdraw (uint256 _tokenID) external {
+    function withdraw (uint256 _tokenID) external {
         
         for (uint i=0 ; i<Deals.length ; i++){  
             if (Deals[i].TokenID == _tokenID && Deals[i].Status == true){ 
@@ -67,7 +67,7 @@ contract Exchange {
         }
     }
     
-    function _updatePrice (uint256 _tokenID, uint256 _price ) external {
+    function updatePrice (uint256 _tokenID, uint256 _price ) external {
         
         for (uint i=0 ; i<Deals.length ; i++){  
             if (Deals[i].TokenID == _tokenID && Deals[i].Status == true){ 
@@ -78,7 +78,7 @@ contract Exchange {
         }
     }
     
-    function _buy (uint256 _tokenID) payable external returns (uint256){
+    function buy (uint256 _tokenID) payable external returns (uint256){
         
         for (uint i=0 ; i<Deals.length ; i++){  
             if (Deals[i].TokenID == _tokenID && Deals[i].Status == true){ 
@@ -93,11 +93,11 @@ contract Exchange {
         return _tokenID;
     } 
     
-    function _totalDeals () external view returns (uint256) {
+    function totalDeals () external view returns (uint256) {
         return Deals.length;
     }
     
-    function _getDeal (uint256 _dealID) external view returns(address,uint256,uint256,bool){
+    function getDeal (uint256 _dealID) external view returns(address,uint256,uint256,bool){
         return (Deals[_dealID].Seller,Deals[_dealID].TokenID,Deals[_dealID].Price,Deals[_dealID].Status);
         
     }

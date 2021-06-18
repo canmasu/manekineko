@@ -99,10 +99,9 @@ const contractNeko = new web3.eth.Contract(NekoABI,contractAddressNeko);
         try {
             const accounts = await web3.ethereum.request({ method: 'eth_requestAccounts' });
 
-  ethereum.request({ method: 'eth_requestAccounts' });
 
             this.payByCoin('999000100010','12');
-            ethereum.
+        
             console.log('new account :', accounts);
         } catch (error) {
             if (error.code === 4001) {

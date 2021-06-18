@@ -1,4 +1,4 @@
-# vue_admin
+# NekoExchange
 
 ## Project setup
 ```
