@@ -109,7 +109,8 @@ export default {
       contract :{
         collectibles:null,
         payment:null,
-        neko:null
+        neko:null,
+        ERC20:null
       },
       payment : {
         tokens :[],
@@ -188,6 +189,9 @@ export default {
             this.payment.tokenAddress  = this.payment.tokens[index].tokenAddress;
             this.payment.tokenSymbol   = this.payment.tokens[index].tokenSymbol;
 
+
+            this.contract.ERC20 = new this.web3.eth.Contract(abi_neko, this.payment.tokenAddress);
+
             this.dialogFormVisible = false;
             this.dialogApprove = true;
         }
@@ -204,7 +208,7 @@ export default {
     },
     async approvePayment (_amount){
         // Approve : amount of ERC20 to transfer
-        await this.contract.neko.methods.approve(contract_payment,_amount).send({
+        await this.contract.ERC20.methods.approve(contract_payment,_amount).send({
         from: this.account,
         }).then((res) => {
             console.log('approve ',res);
@@ -216,7 +220,7 @@ export default {
     },
     async allowancePayment (){
         // Allawance : Confirm the approved amount to the beneficial
-        await this.contract.neko.methods.allowance(this.account,contract_payment).send({
+        await this.contract.ERC20.methods.allowance(this.account,contract_payment).send({
         from: this.account,
         }).then((res) => {
             console.log('allowance',res);
