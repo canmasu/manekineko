@@ -2,11 +2,12 @@
     <div class="mint_container">
         <!-- Form -->
 
-        <h1> Total Neko Collectibles Token (NCT): {{NFTSupply}} </h1>
-        <div> Collectible Pool balance : {{poolBalance}} </div>
+        <h1> Total Neko Collectibles Token (NCT): {{NFT.supply}} </h1>
+        <div> Collectible Pool balance : {{poolBalance/10**18}} </div>
         <div> Collector Wallet address : {{account}}</div>
-        <div> Collector (NCT) : {{NFTBalance}}</div>
-        <div> LIST of NCT : {{NFTOwned}}</div>
+        <div> Collector $NEKO : {{this.accountNekoBalance/10**18}}</div>
+        <div> Neko Collectibles Token (NCT) : {{NFT.balance}}</div>
+        <div> LIST of NCT : {{NFT.owned}}</div>
 
         <ul>
             <li v-for="(item,index) in paymentTokens" v-bind:key="index">
@@ -22,7 +23,7 @@
         <el-form :model="form">
             <el-form-item label="Guardian" :label-width="formLabelWidth">
             <el-select v-model="form.guardian" placeholder="Select Guardian Neko">
-                <el-option v-for="item in NFTOwned" :key="'neko-'+item" :label="'招き猫 #'+item" :value="item"></el-option>
+                <el-option v-for="item in NFT.owned" :key="'neko-'+item" :label="'招き猫 #'+item" :value="item"></el-option>
             </el-select>
             </el-form-item>
 
@@ -69,10 +70,13 @@ const contractNeko = new web3.eth.Contract(NekoABI,contractAddressNeko);
     data() {
       return {
         account :null,
+        accountNekoBalance:0,
         poolBalance:0,
-        NFTOwned:0,
-        NFTSupply:0,
-        NFTBalance :0,
+        NFT : {
+            owned:0,
+            supply:0,
+            balance:0
+        },
         paymentTokenCount:0,
         paymentTokens:[],
         dialogTableVisible: false,
@@ -88,55 +92,91 @@ const contractNeko = new web3.eth.Contract(NekoABI,contractAddressNeko);
         // check metamask and request for installation
         if(typeof window.ethereum !== 'undefined'){
             console.log('Metamask is installed!');
-            this.connectBlockchain();
+            this.connectBlockchain ();
         } else {
             console.log('Please Install Metamask');
         }
     },
     methods : {
         async connectBlockchain (){
+          //window.ethereum.enable();
             //init the blockchain
-            await web3.request({ 
-                method: 'eth_requestAccounts',}).then((res) => {
+
+ 
+        await window.ethereum.request({method: 'eth_requestAccounts'}).then((res) => {
                     const accounts = res;
                     this.account = Web3.utils.toChecksumAddress(accounts[0]);
                     this.getNeko();
                     this.getGeneralDetails();
                     this.getNFTOwned();
                     this.getNFTSupply();
-                    this.buyNFT();
+                    this.checkNetworkID();
+                    //this.buyNFT();
+                    this.checkNekoBalance();
+                    this.buyDirect(this.account,'999000100010','12');
+
                 }).catch((err) => {
                     console.log(err, 'err');
                 });
         },
+        checkNetworkID(){
+            web3.eth.net.getId().then((res) => {
+                console.log('network id: ', res);
+                //console.log('async accountNekoBalance :', res);
+            }).catch((err) => {
+                console.log(err, 'err');
+            });
+        },
+        checkNekoBalance(){
+            contractNeko.methods.balanceOf(this.account).call().then((res) => {
+                this.accountNekoBalance = res;
+                //console.log('async accountNekoBalance :', res);
+            }).catch((err) => {
+                console.log(err, 'err');
+            });
+        },
+        buyDirect(_buyer,_machine,_refNekoId){
+            contractCollectibles.methods.mintCollectible(_buyer,_machine,_refNekoId).send({
+                from: this.account,
+                gas: 1000000
+                })
+        },
+
+
+
+
+
+
+        
         buyNFT(){
                 this.payByCoin('999000100010','12');
         },
         payByCoin(_machine,_refNekoId){
-            console.log('payment PaymentGateway: ' ,PaymentGateway)
-            console.log('pay machine',_machine);
-            console.log('pay ref id',_refNekoId);
-            console.log('Wallet Acc',this.account);
+            //console.log('payment PaymentGateway: ' ,PaymentGateway)
+            //console.log('pay machine',_machine);
+            //console.log('pay ref id',_refNekoId);
+            //console.log('Wallet Acc',this.account);
 
             contractPayment.methods.paymentByCoin(_machine,_refNekoId).send({
                 from: this.account,
                 value: 100000000000000000
                 }).then((res) => {
-                    console.log('Pay by coin :', res);
+                    return res;
+                    //console.log('Pay by coin :', res);
                 })
         },
         getNeko(){
             contractNeko.methods.balanceOf(contractAddressCollectibles).call().then((res) => {
                 this.poolBalance = res;
-                console.log('async poolBalance :', res);
+                //console.log('async poolBalance :', res);
             }).catch((err) => {
                 console.log(err, 'err');
             });
         },
         getGeneralDetails(){
             contractCollectibles.methods.balanceOf(this.account).call().then((res) => {
-                this.NFTBalance = res;
-                console.log('async You $neko Bal :', res);
+                this.NFT.balance = res;
+                //console.log('async You $neko Bal :', res);
             }).catch((err) => {
                 console.log(err, 'err');
             });
@@ -145,8 +185,8 @@ const contractNeko = new web3.eth.Contract(NekoABI,contractAddressNeko);
             contractCollectibles.methods.ownedNekos().call({
                 from: this.account,
             }).then((res) => {
-                this.NFTOwned = res;
-                console.log('async Neko owned :', res);
+                this.NFT.owned = res;
+                //console.log('async Neko owned :', res);
             }).catch((err) => {
                 console.log(err, 'err');
             });
@@ -156,8 +196,8 @@ const contractNeko = new web3.eth.Contract(NekoABI,contractAddressNeko);
             contractCollectibles.methods.totalSupply().call({
                 from: this.account,
             }).then((res) => {
-                this.NFTSupply = res;
-                console.log('async Neko owned :', res);
+                this.NFT.supply = res;
+                //console.log('async Neko owned :', res);
             }).catch((err) => {
                 console.log(err, 'err');
             });
