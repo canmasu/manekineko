@@ -305,13 +305,16 @@ export default {
             });
                 
         for(let i=0; i< this.payment.count ;i++){ 
+            
             this.contract.payment.methods.ERC20Tokens(i).call().then((res) => {
-                this.payment.tokens.push({
-                    tokenAddress: res[0],
-                    tokenSymbol: res[1],
-                    tokenQuantity: res[2],
-                    tokenStatus: res[3],
-                });
+                if(res[3]===true){
+                    this.payment.tokens.push({
+                        tokenAddress: res[0],
+                        tokenSymbol: res[1],
+                        tokenQuantity: res[2],
+                        tokenStatus: res[3],
+                    });
+                }
             }).catch((err) => {
                 console.log(err, 'err');
             });
