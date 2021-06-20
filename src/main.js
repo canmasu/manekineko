@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './assets/global.css'
 import './assets/fonts/iconfont.css'
 import axios from 'axios'
+
 Vue.prototype.$http=axios
 axios.defaults.baseURL="http://localhost:8080/api"
 
