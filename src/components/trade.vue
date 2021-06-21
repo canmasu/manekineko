@@ -6,78 +6,137 @@
       Select NFT > Payment Method > Buy
       Select NFT > Set a price > Sell
       </div>
-        <div class="sales_box">
-        <el-form :model="loginForm" class="sales_form">
-            <el-form-item prop="price" class="login_item">
-                <el-input prefix-icon="iconfont icon-user" placeholder="price"></el-input>
-            </el-form-item>
-            <el-form-item>
-                    <el-select v-model="value" placeholder="Select coin">
-                        <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                        </el-option>
-                    </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button size="mini" type="primary" @click="sell()">Sell</el-button>
-            </el-form-item>
-        </el-form>
-        </div>
+
+
+    <el-table  :data="deals.filter(data => !search || data.TokenID.includes(search))" stripe style="width: 100%">
+        <el-table-column prop="Seller" label="Seller" > </el-table-column>
+        <el-table-column prop="Buyer" label="Buyer"> </el-table-column>
+        <el-table-column prop="TokenID" label="招き猫 #"> </el-table-column>             
+        <el-table-column prop="Price" label="Price" > </el-table-column>
+        <el-table-column prop="Currency" label="Currency"> </el-table-column>
+        <el-table-column prop="Status" label="Status"> </el-table-column>   
+        
+        <el-table-column align="right">
+            <template  slot="header">
+                <el-input v-model="search" size="mini" placeholder="Token ID"/>
+            </template>
+
+            <template slot-scope="scope">
+                <router-link :to="'/token/' +scope.row.TokenID">
+                    <el-button size="mini"> View </el-button>
+                </router-link>
+                    <el-button size="mini" type="primary"> Buy </el-button>
+            </template>
+
+        </el-table-column>         
+    </el-table>
+      
+  
     </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        options: [{
-          value: 'opt1',
-          label: '$NEKO'
-        }, {
-          value: 'opt2',
-          label: '$BNB'
-        }, {
-          value: 'opt3',
-          label: '$CAKE'
-        }, {
-          value: 'opt4',
-          label: '$BAKE'
-        }],
-        value: ''
-      }
-    },
-    method :{
-        sell(){
 
+import getWeb3 from '../web3/web3';
+
+import abi_exchange from '../web3/abi_exchange';
+const contract_exchange = '0xA858F4cA9EB9875105126bB3E027396A5fdC8BE1';
+
+export default {
+  data() {
+    return {
+      web3: null,
+      account: null,
+      contract :{
+        exchange:null
+      },
+      totalDeals:0,
+      deals : [],
+      search :0
+    };
+  },
+  mounted() {
+    if (typeof web3 !== 'undefined') {
+
+      console.log('Metamask is installed!');
+
+      getWeb3().then((res) => {
+          this.web3 = res;
+
+          //connect Contracts Exchange
+          this.contract.exchange = new this.web3.eth.Contract(abi_exchange, contract_exchange);
+
+          //get current signed wallet address
+          this.web3.eth.getAccounts().then((accounts) => {
+              [this.account] = accounts;
+
+          // some function
+          this.getDeals();
+
+          }).catch((err) => {
+              console.log(err, 'err!!');
+          });
+      });
+      } else {
+          //alert('Wallet not connected! Kindly use Coinbase Wallet or Google Chrome with Metamask Plugin');
+
+      }
+
+  },
+  methods:{
+
+  getTotalDeals(){
+      this.contract.exchange.methods.totalDeals().call().then((res) => {
+          this.totalDeals = res;
+          console.log('totalDeals :', this.totalDeals);
+      }).catch((err) => {
+          console.log(err, 'err');
+      });
+  },
+
+  getDeals(){
+      this.contract.exchange.methods.totalDeals().call().then((res) => {
+        this.totalDeals = res;
+        console.log('totalDeals :', this.totalDeals);
+
+        // retrive all active deal 
+        for (let i=0; i< this.totalDeals; i++){
+          this.contract.exchange.methods.Deals(i).call().then((res) => {
+            if(res[4]==true){
+              var _currency = 'ETH';
+            }
+            if (res[5]==true){
+              var _status = 'active';
+            }
+            this.deals.push({
+                Seller: res[0],
+                Buyer: res[1],
+                TokenID: res[2],
+                Price: res[3],
+                Currency : _currency,
+                Status : _status
+            });
+        
+          }).catch((err) => {
+              console.log(err, 'err');
+          });
         }
 
-    }
+
+        console.log('Deals :', this.deals);
+
+
+      }).catch((err) => {
+          console.log(err, 'err');
+      });
+  },
+
+
+
   }
+}
 </script>
 
 <style lang="less" scoped>
-.sales_container { 
-    height:100%;
-}
-.sales_box {
-    height:200px;
-    width:300px;
-    padding:5px;
-    background-color: #FFF;
-    border-radius: 10px;
-    position :absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    .login_form{
-        padding: 10px;
-    }
-}
-.sales_form /deep/ .el-input__inner {
-    height: 30px;
-}
 
 </style>

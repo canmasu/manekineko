@@ -2,14 +2,14 @@ const contractAbiExchange = [
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "name_",
-				"type": "string"
+				"internalType": "contract IERC721",
+				"name": "_NFTAddress",
+				"type": "address"
 			},
 			{
-				"internalType": "string",
-				"name": "symbol_",
-				"type": "string"
+				"internalType": "contract IERC20",
+				"name": "_NekoAddress",
+				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -21,23 +21,29 @@ const contractAbiExchange = [
 			{
 				"indexed": true,
 				"internalType": "address",
-				"name": "owner",
+				"name": "_seller",
 				"type": "address"
 			},
 			{
 				"indexed": true,
 				"internalType": "address",
-				"name": "spender",
+				"name": "_buyer",
 				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "_tokenID",
+				"type": "uint256"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "value",
+				"name": "price",
 				"type": "uint256"
 			}
 		],
-		"name": "Approval",
+		"name": "BUY",
 		"type": "event"
 	},
 	{
@@ -46,82 +52,122 @@ const contractAbiExchange = [
 			{
 				"indexed": true,
 				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
+				"name": "_seller",
 				"type": "address"
 			},
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "value",
+				"name": "_tokenID",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "price",
 				"type": "uint256"
 			}
 		],
-		"name": "Transfer",
+		"name": "OFFER",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "_seller",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_tokenID",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "UPDATEPRICE",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "_seller",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_tokenID",
+				"type": "uint256"
+			}
+		],
+		"name": "WITHDRAW",
 		"type": "event"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
+		"name": "Deals",
+		"outputs": [
 			{
 				"internalType": "address",
-				"name": "spender",
+				"name": "Seller",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "Buyer",
 				"type": "address"
 			},
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "TokenID",
 				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [
+			},
+			{
+				"internalType": "uint256",
+				"name": "Price",
+				"type": "uint256"
+			},
 			{
 				"internalType": "bool",
-				"name": "",
+				"name": "Currency",
+				"type": "bool"
+			},
+			{
+				"internalType": "bool",
+				"name": "Status",
 				"type": "bool"
 			}
 		],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "_tokenID",
+				"type": "uint256"
 			}
 		],
-		"name": "balanceOf",
+		"name": "buy",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -129,60 +175,28 @@ const contractAbiExchange = [
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "_tokenID",
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "subtractedValue",
+				"name": "_Price",
 				"type": "uint256"
-			}
-		],
-		"name": "decreaseAllowance",
-		"outputs": [
+			},
 			{
 				"internalType": "bool",
-				"name": "",
+				"name": "_Currency",
 				"type": "bool"
 			}
 		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "addedValue",
-				"type": "uint256"
-			}
-		],
-		"name": "increaseAllowance",
+		"name": "offer",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -195,33 +209,7 @@ const contractAbiExchange = [
 	},
 	{
 		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalSupply",
+		"name": "totalDeals",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -235,53 +223,31 @@ const contractAbiExchange = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "recipient",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "_tokenID",
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "_price",
 				"type": "uint256"
 			}
 		],
-		"name": "transfer",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
+		"name": "updatePrice",
+		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "recipient",
-				"type": "address"
-			},
-			{
 				"internalType": "uint256",
-				"name": "amount",
+				"name": "_tokenID",
 				"type": "uint256"
 			}
 		],
-		"name": "transferFrom",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
+		"name": "withdraw",
+		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	}

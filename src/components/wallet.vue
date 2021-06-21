@@ -7,10 +7,7 @@
         <div> records </div>
         <div> NFT Transcations (the trading record) </div>
         <div> Maneki $Neko (Coins invited record</div>
-        <div> Token Name : {{name}}</div>
-        <div> Token Supply : {{tokenSupply}} <br></div>
         <div> My Walllet address : {{account}}</div>
-        <div> Balance : {{balance}}</div>
 
 
 
@@ -29,6 +26,7 @@
                 <router-link :to="'/token/' +scope.row.tokenID">
                     <el-button size="mini"> View </el-button>
                 </router-link>
+                    <el-button size="mini" type="primary"> Sell </el-button>
             </template>
 
         </el-table-column>   

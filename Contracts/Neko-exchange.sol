@@ -1,46 +1,56 @@
 // SPDX-License-Identifier: MIT
 
-// input number lucky NFT
-// Changed the Maneki Pool relatively to the Royalty distribution
-// Zero Transaction Fee
+// Trading Currency True. ETH AND False. NEKO
+// Zero Transaction Fee with $NEKO
+// Transaction Fee for ETh deal, with the retrun of $NEKO
+
 
 // multi-payment
 
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts@4.1.0/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts@4.1.0/token/ERC20/IERC20.sol";
 
 contract Exchange {
 
-    constructor (IERC721 _contractAddress) public {
-        NFTAddress = _contractAddress;
+    constructor (IERC721 _NFTAddress, IERC20 _NekoAddress) public {
+        NFTAddress  = _NFTAddress;
+        NEKOAddress = _NekoAddress;
     }
 
     struct Deal { 
         address Seller;
+        address Buyer;
         uint256 TokenID;
         uint256 Price;
+        bool    Currency;
         bool    Status;
     }
     Deal[] public Deals;
     IERC721 NFTAddress;
+    IERC20  NEKOAddress;
+
     
-    event TRANSACTED (address indexed _seller, address indexed _buyer, uint256 indexed _tokenID, uint256 price);
-    event SALES      (address indexed _seller, uint256 _tokenID, uint256 price);
+    
+    event BUY        (address indexed _seller, address indexed _buyer, uint256 indexed _tokenID, uint256 price);
+    event OFFER      (address indexed _seller, uint256 _tokenID, uint256 price);
     event WITHDRAW   (address indexed _seller, uint256 _tokenID);
     event UPDATEPRICE(address indexed _seller, uint256 _tokenID, uint256 price);
 
-    function sale (uint256 _tokenID, uint256 _Price) external returns (bool){
+    function offer (uint256 _tokenID, uint256 _Price, bool _Currency) external returns (bool){
         Deal memory newDeal = Deal({
-            Seller : msg.sender,
+            Seller   : msg.sender,
+            Buyer    : msg.sender,
             TokenID  : _tokenID,
             Price    : _Price,
+            Currency : _Currency,
             Status   : true
         });
         Deals.push(newDeal);
     
         _escrow(_tokenID);
-        emit SALES (msg.sender,_tokenID,_Price);
+        emit OFFER (msg.sender,_tokenID,_Price);
         return true;
     }
 
@@ -82,12 +92,24 @@ contract Exchange {
         
         for (uint i=0 ; i<Deals.length ; i++){  
             if (Deals[i].TokenID == _tokenID && Deals[i].Status == true){ 
-                require (msg.value ==  Deals[i].Price);
-                address to = msg.sender;
-                NFTAddress.approve(to, _tokenID);
-                NFTAddress.transferFrom(address(this),to,_tokenID);
+
+                address buyer = msg.sender;
+
+                if (Deals[i].Currency == true ){
+                    // trade with ETH
+                    payable(Deals[i].Seller).transfer(Deals[i].Price);
+                } else {
+                    // TRADE with $NEKO
+                    // PRE Approve and Allowance , than only execute transferFrom
+                    NEKOAddress.transferFrom(buyer, Deals[i].Seller , Deals[i].Price);
+                }
+
+                // Transfer NFT to Buyer Wallet
+                NFTAddress.approve(buyer, _tokenID);
+                NFTAddress.transferFrom(address(this),buyer,_tokenID);
                 Deals[i].Status = false;
-                emit TRANSACTED (address(this),to,_tokenID,Deals[i].Price);
+                
+                emit BUY (Deals[i].Seller,buyer,_tokenID,Deals[i].Price);
             }
         }
         return _tokenID;
@@ -97,10 +119,6 @@ contract Exchange {
         return Deals.length;
     }
     
-    function getDeal (uint256 _dealID) external view returns(address,uint256,uint256,bool){
-        return (Deals[_dealID].Seller,Deals[_dealID].TokenID,Deals[_dealID].Price,Deals[_dealID].Status);
-        
-    }
 
 
 }

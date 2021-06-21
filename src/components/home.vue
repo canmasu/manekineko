@@ -31,12 +31,12 @@
                 </el-menu-item>
 
 
-                <el-menu-item index="maneki">
+                <el-menu-item index="manekineko">
                     <i class="iconfont icon-dollar"></i>
                     <span slot="title">Maneki $NEKO</span>
                 </el-menu-item>
 
-                <el-menu-item index="manekineko">
+                <el-menu-item index="mint">
                     <i class="iconfont icon-dollar"></i>
                     <span slot="title">Buy & Mint</span>
                 </el-menu-item>

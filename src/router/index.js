@@ -10,6 +10,7 @@ import Manekineko from '../components/manekineko.vue'
 import Analytics from '../components/analytics.vue'
 import Contact from '../components/contact.vue'
 import Token from '../components/token.vue'
+import Mint from '../components/mint.vue'
 
 
 Vue.use(VueRouter)
@@ -25,6 +26,7 @@ const routes = [
       {path: '/trade', component:Trade },
       {path: '/launchpad', component:Launchpad },
       {path: '/manekineko', component:Manekineko },
+      {path: '/mint', component:Mint },
       {path: '/analytics', component:Analytics },
       {path: '/contact', component:Contact },
       {path: '/token/:id', component:Token }
