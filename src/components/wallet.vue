@@ -86,7 +86,7 @@ import abi_collectible from '../web3/abi_nekocollectible';
 const contract_collectible = '0x9CCD560e93C2be416edE43C4E97941b7b443b9CE';
 
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0xA858F4cA9EB9875105126bB3E027396A5fdC8BE1';
+const contract_exchange = '0xA70b9A701173A59AAD272eC9b118853C150DfE8F';
 
 
 export default {
@@ -208,7 +208,6 @@ export default {
                 this.offerForm.tokenID,
                 this.offerForm.price,
                 this.offerForm.currency,
-                this.account
                 ).send({
             from: this.account,
             }).then((res) => {

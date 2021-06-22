@@ -38,7 +38,7 @@ contract Exchange {
     event WITHDRAW   (address indexed _seller, uint256 _tokenID);
     event UPDATEPRICE(address indexed _seller, uint256 _tokenID, uint256 price);
 
-    function offer (uint256 _tokenID, uint256 _Price, bool _Currency) external returns (bool){
+    function offer (uint256 _tokenID, uint256 _Price, bool _Currency, address _Buy) external returns (bool){
         Deal memory newDeal = Deal({
             Seller   : msg.sender,
             Buyer    : msg.sender,
@@ -101,7 +101,7 @@ contract Exchange {
                 } else {
                     // TRADE with $NEKO
                     // PRE Approve and Allowance , than only execute transferFrom
-                    NEKOAddress.transferFrom(buyer, Deals[i].Seller , Deals[i].Price);
+                    NEKOAddress.transfer(Deals[i].Seller , Deals[i].Price);
                 }
 
                 // Transfer NFT to Buyer Wallet

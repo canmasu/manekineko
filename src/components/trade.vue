@@ -40,7 +40,7 @@
 import getWeb3 from '../web3/web3';
 
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0xA858F4cA9EB9875105126bB3E027396A5fdC8BE1';
+const contract_exchange = '0xA70b9A701173A59AAD272eC9b118853C150DfE8F';
 
 export default {
   data() {
