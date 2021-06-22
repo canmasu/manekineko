@@ -25,13 +25,53 @@
                 <router-link :to="'/token/' +scope.row.TokenID">
                     <el-button size="mini"> View </el-button>
                 </router-link>
-                    <el-button size="mini" type="danger" > Buy </el-button>
+                    <el-button size="mini" type="danger" 
+                        @click="wantToBuy(
+                          scope.row.DealID, 
+                          scope.row.TokenID,
+                          scope.row.Price,
+                          scope.row.Currency)"> BUY 
+                    </el-button>
             </template>
+      
 
         </el-table-column>         
     </el-table>
 
+    <el-dialog title="Buy Neko Collectible" :visible.sync="dialog.buyNFT">
+        <el-form :model="buyForm">
+            <el-form-item label="NFT" :label-width="formLabelWidth">
+              招き猫 # {{buyForm.TokenID}}
+            </el-form-item>
+            <el-form-item label="Price" :label-width="formLabelWidth">
+              ${{buyForm.Currency}} {{buyForm.Price}}
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialog.buyNFT = false">Cancel</el-button>
+            <el-button type="primary" @click="buyNFT()"> Confirm </el-button>
+        </div>
+    </el-dialog>
+
+
+    <el-dialog title="Approve $Neko to use" :visible.sync="dialog.approveSpend">
+        <div>${{buyForm.Currency}} {{buyForm.Price}} be use for buying </div>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialog.approveSpend = false">Cancel</el-button>
+            <el-button type="primary" @click="approve()"> Confirm </el-button>
+        </div>
+    </el-dialog>
   
+    <el-dialog title="Payment confirm" :visible.sync="dialog.paymentConfirm">
+        <div> 招き猫 # {{buyForm.TokenID}} </div>
+        <div>${{buyForm.Currency}} {{buyForm.Price}}</div>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialog.approveSpend = false">Cancel</el-button>
+            <el-button type="primary" @click="paymentConfirm()"> Confirm </el-button>
+        </div>
+    </el-dialog>
+
+
     </div>
 </template>
 
@@ -39,8 +79,13 @@
 
 import getWeb3 from '../web3/web3';
 
+// Contract : Exchange
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0xA70b9A701173A59AAD272eC9b118853C150DfE8F';
+const contract_exchange = '0x20C15FBD845F5117165cf508cbe57598765B41b4';
+
+// Contract : ERC20 - $NEKO
+import abi_neko from '../web3/abi_neko';
+const contract_neko = '0xdF3CF86Faed8a1936F3dB48a374E981e3fFC3164';
 
 export default {
   data() {
@@ -48,16 +93,27 @@ export default {
       web3: null,
       account: null,
       contract :{
-        exchange:null
+        exchange:null,
+        neko:null
       },
       dialog :{
-          buyWithBNB : false
+          buyNFT : false,
+          approveSpend : false,
+          paymentConfirm : false
+      },
+      buyForm: {
+          DealID: '',
+          TokenID: '',
+          Price :'',
+          Currency : ''
       },
       totalDeals:0,
       deals : [],
-      search :0
+      search :0,
+      formLabelWidth: '120px'
     };
   },
+
   mounted() {
     if (typeof web3 !== 'undefined') {
 
@@ -68,6 +124,7 @@ export default {
 
           //connect Contracts Exchange
           this.contract.exchange = new this.web3.eth.Contract(abi_exchange, contract_exchange);
+          this.contract.neko = new this.web3.eth.Contract(abi_neko, contract_neko);
 
           //get current signed wallet address
           this.web3.eth.getAccounts().then((accounts) => {
@@ -88,7 +145,55 @@ export default {
   },
   methods:{
 
-  getTotalDeals(){
+wantToBuy (_DealID, _TokenID, _Price, _Currency) {
+    this.buyForm.DealID = _DealID;
+    this.buyForm.TokenID = _TokenID;
+    this.buyForm.Price = _Price;
+    this.buyForm.Currency = _Currency;
+    this.dialog.buyNFT = true;
+},
+buyNFT (){
+
+  if(this.buyForm.Currency=='BNB'){
+    // connect to buy_byETH
+    this.payWithETH();
+  } else {
+    // connect to buy_byERC20
+    this.dialog.buyNFT = false;
+    this.dialog.approveSpend = true;
+
+  }
+
+},
+payWithETH () {
+    this.contract.exchange.methods.buy_byETH(this.buyForm.DealID,this.buyForm.TokenID).send({
+      from: this.account,
+      value: this.buyForm.Price
+    }).then((res) => {
+        console.log('buy NFT success :' ,res);
+        this.dialog.buyNFT = false;
+    })
+},
+approve(){
+    this.contract.neko.methods.approve(contract_exchange,this.buyForm.Price).send({
+      from: this.account
+    }).then((res) => {
+        console.log('approved ! :' ,res);
+        this.dialog.approveSpend = false;
+        this.dialog.paymentConfirm = true;
+    })
+
+},
+paymentConfirm() {
+    this.contract.exchange.methods.buy_byERC20(this.buyForm.DealID,this.buyForm.TokenID).send({
+      from: this.account
+    }).then((res) => {
+        console.log('buy NFT success :' ,res);
+        this.dialog.paymentConfirm = false;
+        
+    })
+},
+getTotalDeals(){
       this.contract.exchange.methods.totalDeals().call().then((res) => {
           this.totalDeals = res;
           console.log('totalDeals :', this.totalDeals);
@@ -119,7 +224,7 @@ export default {
                   DealID: i,
                   Seller: res[0],
                   Buyer: res[1],
-                  TokenID: '招き猫 #' + res[2],
+                  TokenID: res[2],
                   Price: res[3],
                   Currency : _currency,
                   Status : _status

@@ -38,7 +38,7 @@ contract Exchange {
     event WITHDRAW   (address indexed _seller, uint256 _tokenID);
     event UPDATEPRICE(address indexed _seller, uint256 _tokenID, uint256 price);
 
-    function offer (uint256 _tokenID, uint256 _Price, bool _Currency, address _Buy) external returns (bool){
+    function offer (uint256 _tokenID, uint256 _Price, bool _Currency) external returns (bool){
         Deal memory newDeal = Deal({
             Seller   : msg.sender,
             Buyer    : msg.sender,
@@ -65,60 +65,69 @@ contract Exchange {
         NFTAddress.transferFrom(address(this),to,_tokenID);
     }
     
-    function withdraw (uint256 _tokenID) external {
-        
-        for (uint i=0 ; i<Deals.length ; i++){  
-            if (Deals[i].TokenID == _tokenID && Deals[i].Status == true){ 
-                require (msg.sender == Deals[i].Seller);
-                _unescrow;
-                Deals[i].Status = false;
-                emit WITHDRAW (msg.sender,_tokenID);
-            }
-        }
+    function withdraw (uint256 _dealID, uint256 _tokenID) external {
+        require (Deals[_dealID].TokenID == _tokenID && Deals[_dealID].Status == true && msg.sender == Deals[_dealID].Seller);
+        _unescrow;
+        Deals[_dealID].Status = false;
+        emit WITHDRAW (msg.sender,_tokenID);
     }
     
-    function updatePrice (uint256 _tokenID, uint256 _price ) external {
+    function updatePrice (uint256 _dealID, uint256 _tokenID, uint256 _price ) external {
         
-        for (uint i=0 ; i<Deals.length ; i++){  
-            if (Deals[i].TokenID == _tokenID && Deals[i].Status == true){ 
-                require (msg.sender == Deals[i].Seller);
-                Deals[i].Price = _price;
-                emit UPDATEPRICE (Deals[i].Seller,_tokenID,_price);
-            }
-        }
+        require(Deals[_dealID].TokenID == _tokenID && Deals[_dealID].Status == true && msg.sender == Deals[_dealID].Seller);
+        Deals[_dealID].Price = _price;
+        emit UPDATEPRICE (Deals[_dealID].Seller,_tokenID,_price);
     }
     
-    function buy (uint256 _tokenID) payable external returns (uint256){
+    function buy_byETH (uint256 _dealID, uint256 _tokenID) payable external returns (uint256){
+        // buy NFT pay by ETH
+        require(Deals[_dealID].TokenID == _tokenID &&Deals[_dealID].Status == true && Deals[_dealID].Currency== true);
         
-        for (uint i=0 ; i<Deals.length ; i++){  
-            if (Deals[i].TokenID == _tokenID && Deals[i].Status == true){ 
-
-                address buyer = msg.sender;
-
-                if (Deals[i].Currency == true ){
-                    // trade with ETH
-                    payable(Deals[i].Seller).transfer(Deals[i].Price);
-                } else {
-                    // TRADE with $NEKO
-                    // PRE Approve and Allowance , than only execute transferFrom
-                    NEKOAddress.transfer(Deals[i].Seller , Deals[i].Price);
-                }
-
-                // Transfer NFT to Buyer Wallet
-                NFTAddress.approve(buyer, _tokenID);
-                NFTAddress.transferFrom(address(this),buyer,_tokenID);
-                Deals[i].Status = false;
+        // Pay with ETH
+        payable(Deals[_dealID].Seller).transfer(Deals[_dealID].Price);
+            
+        // Transfer NFT to Buyer Wallet
+        transferNFT(msg.sender,_tokenID);
                 
-                emit BUY (Deals[i].Seller,buyer,_tokenID,Deals[i].Price);
-            }
-        }
+        // update Deals status and buyer to inactive
+        Deals[_dealID].Buyer = msg.sender;
+        Deals[_dealID].Status = false;
+                
+        emit BUY (Deals[_dealID].Seller,msg.sender,_tokenID,Deals[_dealID].Price);
+
         return _tokenID;
     } 
+    
+    
+    function buy_byERC20 (uint256 _dealID, uint256 _tokenID) external returns (uint256){
+        // buy NFT pay by ERC20 token
+        require(Deals[_dealID].TokenID == _tokenID &&Deals[_dealID].Status == true && Deals[_dealID].Currency== false);
+
+        // Pay with $NEKO
+        // PRE Approve and Allowance , than only execute transferFrom
+        NEKOAddress.transferFrom(msg.sender, Deals[_dealID].Seller,  Deals[_dealID].Price);
+
+        // Transfer NFT to Buyer Wallet
+        transferNFT(msg.sender,_tokenID);
+                
+        // update Deals status and buyer to inactive
+        Deals[_dealID].Buyer = msg.sender;
+        Deals[_dealID].Status = false;
+                
+        emit BUY (Deals[_dealID].Seller, msg.sender, _tokenID,Deals[_dealID].Price);
+        
+        return _tokenID;
+    } 
+    
+    function transferNFT (address _buyer, uint256 _tokenID) internal {
+        // Transfer NFT to Buyer Wallet
+        NFTAddress.approve(_buyer, _tokenID);
+        NFTAddress.transferFrom(address(this),_buyer,_tokenID);
+    }
+    
     
     function totalDeals () external view returns (uint256) {
         return Deals.length;
     }
     
-
-
 }

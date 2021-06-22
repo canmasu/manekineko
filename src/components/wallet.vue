@@ -86,7 +86,7 @@ import abi_collectible from '../web3/abi_nekocollectible';
 const contract_collectible = '0x9CCD560e93C2be416edE43C4E97941b7b443b9CE';
 
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0xA70b9A701173A59AAD272eC9b118853C150DfE8F';
+const contract_exchange = '0x20C15FBD845F5117165cf508cbe57598765B41b4';
 
 
 export default {
@@ -212,6 +212,7 @@ export default {
             from: this.account,
             }).then((res) => {
                 console.log('deal ',res);
+                this.dialog.offerForm = false;
             })
 
         }

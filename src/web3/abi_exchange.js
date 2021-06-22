@@ -51,11 +51,16 @@ const contractAbiExchange =
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_dealID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
 				"name": "_tokenID",
 				"type": "uint256"
 			}
 		],
-		"name": "buy_ERC20",
+		"name": "buy_byERC20",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -70,11 +75,16 @@ const contractAbiExchange =
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_dealID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
 				"name": "_tokenID",
 				"type": "uint256"
 			}
 		],
-		"name": "buy_ETH",
+		"name": "buy_byETH",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -143,6 +153,11 @@ const contractAbiExchange =
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "_dealID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
 				"name": "_tokenID",
 				"type": "uint256"
 			},
@@ -184,6 +199,11 @@ const contractAbiExchange =
 	},
 	{
 		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_dealID",
+				"type": "uint256"
+			},
 			{
 				"internalType": "uint256",
 				"name": "_tokenID",
