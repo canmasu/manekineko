@@ -9,8 +9,8 @@
 
 
     <el-table  :data="deals.filter(data => !search || data.TokenID.includes(search))" stripe style="width: 100%">
+        <el-table-column prop="DealID" label="Deal ID" > </el-table-column>
         <el-table-column prop="Seller" label="Seller" > </el-table-column>
-        <el-table-column prop="Buyer" label="Buyer"> </el-table-column>
         <el-table-column prop="TokenID" label="招き猫 #"> </el-table-column>             
         <el-table-column prop="Price" label="Price" > </el-table-column>
         <el-table-column prop="Currency" label="Currency"> </el-table-column>
@@ -25,12 +25,12 @@
                 <router-link :to="'/token/' +scope.row.TokenID">
                     <el-button size="mini"> View </el-button>
                 </router-link>
-                    <el-button size="mini" type="primary"> Buy </el-button>
+                    <el-button size="mini" type="danger" > Buy </el-button>
             </template>
 
         </el-table-column>         
     </el-table>
-      
+
   
     </div>
 </template>
@@ -49,6 +49,9 @@ export default {
       account: null,
       contract :{
         exchange:null
+      },
+      dialog :{
+          buyWithBNB : false
       },
       totalDeals:0,
       deals : [],
@@ -102,20 +105,26 @@ export default {
         // retrive all active deal 
         for (let i=0; i< this.totalDeals; i++){
           this.contract.exchange.methods.Deals(i).call().then((res) => {
+            var _currency = '';
+            var _status = '';
+
             if(res[4]==true){
-              var _currency = 'ETH';
+              _currency = 'BNB';
+            } else {
+              _currency = 'NEKO';
             }
             if (res[5]==true){
-              var _status = 'active';
+              _status = 'active';
+              this.deals.push({
+                  DealID: i,
+                  Seller: res[0],
+                  Buyer: res[1],
+                  TokenID: '招き猫 #' + res[2],
+                  Price: res[3],
+                  Currency : _currency,
+                  Status : _status
+              });
             }
-            this.deals.push({
-                Seller: res[0],
-                Buyer: res[1],
-                TokenID: res[2],
-                Price: res[3],
-                Currency : _currency,
-                Status : _status
-            });
         
           }).catch((err) => {
               console.log(err, 'err');

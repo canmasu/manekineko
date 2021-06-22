@@ -26,13 +26,54 @@
                 <router-link :to="'/token/' +scope.row.tokenID">
                     <el-button size="mini"> View </el-button>
                 </router-link>
-                    <el-button size="mini" type="primary"> Sell </el-button>
+                    <el-button size="mini" type="primary" @click="wantToSell(scope.row.tokenID)"> Sell </el-button>
             </template>
 
         </el-table-column>   
              
     </el-table>
 
+    
+    <el-dialog title="List this NFT to exchange" :visible.sync="dialog.approveToExchange">
+        <el-form :model="approvalForm">
+            <el-form-item label="NFT" :label-width="formLabelWidth">
+            <el-select v-model="approvalForm.tokenID" placeholder="Select NFT">
+                <el-option :key="'neko-'+approvalForm.tokenID" :label="'招き猫 #'+approvalForm.tokenID" :value="approvalForm.tokenID"></el-option>
+            </el-select>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialog.approveToExchange = false">Cancel</el-button>
+            <el-button type="primary" @click="approveTransfer()"> Approve </el-button>
+        </div>
+    </el-dialog>
+
+
+    <el-dialog title="Make an offer" :visible.sync="dialog.offerForm">
+        <el-form :model="offerForm">
+            <el-form-item label="NFT" :label-width="formLabelWidth">
+            <el-select v-model="offerForm.tokenID" placeholder="Select NFT">
+                <el-option :key="'neko-'+approvalForm.tokenID" :label="'招き猫 #'+approvalForm.tokenID" :value="approvalForm.tokenID"></el-option>
+            </el-select>
+            </el-form-item>
+
+            <el-form-item label="Coin" :label-width="formLabelWidth">
+                <el-radio-group v-model="offerForm.currency" size="medium">
+                <el-radio border label="BNB" value="BNB" primary></el-radio>
+                <el-radio border label="NEKO" value="NEKO"></el-radio>
+                </el-radio-group>
+            </el-form-item>
+
+            <el-form-item label="Amout" :label-width="formLabelWidth">
+                <el-input v-model="offerForm.price"></el-input>
+            </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialog.offerForm = false">Cancel</el-button>
+            <el-button type="primary" @click="makeAnOffer()"> Confirm </el-button>
+        </div>
+    </el-dialog>    
 
     </div>
 </template>
@@ -43,6 +84,10 @@ import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_nekocollectible';
 const contract_collectible = '0x9CCD560e93C2be416edE43C4E97941b7b443b9CE';
+
+import abi_exchange from '../web3/abi_exchange';
+const contract_exchange = '0xA858F4cA9EB9875105126bB3E027396A5fdC8BE1';
+
 
 export default {
     data(){
@@ -64,8 +109,23 @@ export default {
             NFTList :[],
             search: '',
             contract :{
-                collectibles:null
-            }
+                collectibles:null,
+                exchange :null
+            },
+            dialog :{
+                approveToExchange : false,
+                offerForm : false
+            },
+            approvalForm: {
+                tokenID: ''
+            },
+            offerForm: {
+                tokenID: '',
+                price: '',
+                currency:'',
+                buyer:''
+            },
+            formLabelWidth: '120px'
 
         }
     },
@@ -79,6 +139,8 @@ export default {
 
                 //connect Contracts Collectibles, 
                 this.contract.collectibles = new this.web3.eth.Contract(abi_collectible, contract_collectible);
+                //connect Contracts Exchange
+                this.contract.exchange = new this.web3.eth.Contract(abi_exchange, contract_exchange);
                 
                 //get current signed wallet address
                 this.web3.eth.getAccounts().then((accounts) => {
@@ -115,10 +177,46 @@ export default {
             });
 
         },
-        handleView(index, row) {
-            console.log('the index :', index);
-            console.log('the row :', row);
+        wantToSell (_tokenID) {
+            this.approvalForm.tokenID = _tokenID;
+            this.dialog.approveToExchange = true;
+        },
+
+
+        approveTransfer (){
+            // Approve : this NFT transfer to Exchange
+            this.contract.collectibles.methods.approve(contract_exchange , this.approvalForm.tokenID).send({
+            from: this.account,
+            }).then((res) => {
+                console.log('approve ',res);
+                
+                this.offerForm.tokenID = this.approvalForm.tokenID;
+                this.dialog.approveToExchange = false;
+                this.dialog.offerForm = true;
+            })
+        },
+
+        makeAnOffer (){
+            // Offer : Set the price for sale
+            if (this.offerForm.currency=="BNB"){
+                this.offerForm.currency = true;
+            } else {
+                this.offerForm.currency = false;
+            }
+
+            this.contract.exchange.methods.offer(
+                this.offerForm.tokenID,
+                this.offerForm.price,
+                this.offerForm.currency,
+                this.account
+                ).send({
+            from: this.account,
+            }).then((res) => {
+                console.log('deal ',res);
+            })
+
         }
+
     }
 }
 </script>

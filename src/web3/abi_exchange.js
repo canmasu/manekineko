@@ -194,6 +194,11 @@ const contractAbiExchange = [
 				"internalType": "bool",
 				"name": "_Currency",
 				"type": "bool"
+			},
+			{
+				"internalType": "address",
+				"name": "_Buyer",
+				"type": "address"
 			}
 		],
 		"name": "offer",
