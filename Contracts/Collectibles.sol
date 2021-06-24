@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-
+// BSC 0.V3.01
 // input number lucky NFT
 // Changed the Maneki Pool relatively to the Royalty distribution
 
@@ -83,7 +83,7 @@ contract NekoCollectibles is ERC721 {
     address artistAddr;
     address developerAddr;
     
-    uint256 manikiPoolSize;
+    uint256 manekiPoolSize;
     uint256 royaltyAmount;
     uint256 incentiveAmount;
     uint256 bonusAmount;
@@ -100,7 +100,7 @@ contract NekoCollectibles is ERC721 {
      *
      */
 
-    constructor(IERC20 _nekoContractAddr, uint256 _manikiPoolSize, address _artistAddr, address _developerAddr) ERC721("Neko Collectibles", "NC") public {
+    constructor(IERC20 _nekoContractAddr, uint256 _manekiPoolSize, address _artistAddr, address _developerAddr) ERC721("Neko Collectibles", "NC") public {
         CLevel memory newCLevel = CLevel({
             CLevelAddress : msg.sender,
             Role : 1,
@@ -109,12 +109,12 @@ contract NekoCollectibles is ERC721 {
         CLevels.push(newCLevel);
         
         manekiTokenAddress = _nekoContractAddr;
-        manikiPoolSize     = _manikiPoolSize;
-        royaltyAmount      = _manikiPoolSize/10*2;
-        incentiveAmount    = _manikiPoolSize/10*2;
-        bonusAmount        = _manikiPoolSize/10*2;
-        artistAmount       = _manikiPoolSize/10*3;
-        developerAmount    = _manikiPoolSize/10*1;
+        manekiPoolSize     = _manekiPoolSize;
+        royaltyAmount      = _manekiPoolSize/10*2;
+        incentiveAmount    = _manekiPoolSize/10*2;
+        bonusAmount        = _manekiPoolSize/10*2;
+        artistAmount       = _manekiPoolSize/10*3;
+        developerAmount    = _manekiPoolSize/10*1;
     }
 
 
@@ -588,9 +588,11 @@ contract NekoCollectibles is ERC721 {
      function setICO (bool _status) external onlyCLevel() returns (bool) {
          return ICO = _status;
      }
-     
+     fucntion setManekiPool (uint256 _manekiPoolSize) external onlyCLevel() returns (bool) {
+         return manekiPoolSize = _manekiPoolSize;
+     }
     function viewSetting () public view returns (address,address,uint256,uint256,uint256,uint256,uint256,uint256){
-        return (artistAddr,developerAddr,manikiPoolSize,royaltyAmount,incentiveAmount,bonusAmount,artistAmount,developerAmount);
+        return (artistAddr,developerAddr,manekiPoolSize,royaltyAmount,incentiveAmount,bonusAmount,artistAmount,developerAmount);
     }
      
 }
