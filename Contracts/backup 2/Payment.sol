@@ -5,7 +5,7 @@ pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts@4.1.0/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts@4.1.0/utils/Strings.sol";
-import "./Collectibles.sol";
+import "./Neko-Collectibles.sol";
 
 
 /**

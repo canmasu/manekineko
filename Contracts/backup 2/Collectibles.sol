@@ -9,7 +9,6 @@ import "@openzeppelin/contracts@4.1.0/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts@4.1.0/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts@4.1.0/utils/Strings.sol";
 import "@openzeppelin/contracts@4.1.0/token/ERC20/IERC20.sol";
-import "./Clubhouse.sol";
 
 
 contract NekoCollectibles is ERC721 {
@@ -42,6 +41,12 @@ contract NekoCollectibles is ERC721 {
     }
 
 
+    struct Participent {
+        address referrerAddr;
+    }
+    
+    mapping (address => Participent) public participents;
+    address[] public participentAdds;
     
     /**
      * List of existing CLevel
@@ -85,8 +90,6 @@ contract NekoCollectibles is ERC721 {
     uint256 artistAmount;
     uint256 developerAmount;
     
-    address clubhouseContract;
-    
     
     // Initial Collectibles Offering
     bool    ICO = true;
@@ -97,15 +100,13 @@ contract NekoCollectibles is ERC721 {
      *
      */
 
-    constructor(IERC20 _nekoContractAddr, address _clubhouseContract, uint256 _manekiPoolSize, address _artistAddr, address _developerAddr) ERC721("Neko Collectibles", "NC") public {
+    constructor(IERC20 _nekoContractAddr, uint256 _manekiPoolSize, address _artistAddr, address _developerAddr) ERC721("Neko Collectibles", "NC") public {
         CLevel memory newCLevel = CLevel({
             CLevelAddress : msg.sender,
             Role : 1,
             Status : true
         });
         CLevels.push(newCLevel);
-        
-        clubhouseContract  = _clubhouseContract;
         
         manekiTokenAddress = _nekoContractAddr;
         manekiPoolSize     = _manekiPoolSize;
@@ -253,6 +254,7 @@ contract NekoCollectibles is ERC721 {
         uint256 DNA;
         uint256 manekiPower;
         uint256 generation;
+        uint256 _newNeko;
         uint256 _newGammaNekoID;
 
         Neko storage NEKO = Nekos[_refNekoId];
@@ -289,10 +291,7 @@ contract NekoCollectibles is ERC721 {
         
         // Incenttive for Referrer 
         // >>  check the clublchouse
-        
-        Clubhouse Contract = Clubhouse(clubhouseContract);
-
-        if (Contract.getReferrer(msg.sender) == address(0x0)) {
+        if (participents[msg.sender].referrerAddr == address(0x0)) {
             premiumCollectorIncentive(msg.sender);
         }
     }
@@ -432,12 +431,10 @@ contract NekoCollectibles is ERC721 {
     function premiumCollectorIncentive(address _participentAddr) internal {
         uint256 _amount ;
         
-        Clubhouse Contract = Clubhouse(clubhouseContract);
-        
-        if (balanceOf(Contract.getReferrer(_participentAddr)) > 9){    
+        if (balanceOf(participents[_participentAddr].referrerAddr) > 9){    
             
             //check referer
-            if (balanceOf(Contract.getReferrer(_participentAddr)) > 99){
+            if (balanceOf(participents[_participentAddr].referrerAddr) > 99){
                 // 20%
                 _amount = incentiveAmount;
             } else {
@@ -446,7 +443,7 @@ contract NekoCollectibles is ERC721 {
             }
             
             address payable _payee;
-            _payee = payable(Contract.getReferrer(_participentAddr));
+            _payee = payable(participents[_participentAddr].referrerAddr);
                 
             // Tranfers ERC20 Token to Premium Collector 
             manekiPayout (address(this), _payee, _amount);
@@ -522,7 +519,40 @@ contract NekoCollectibles is ERC721 {
             return result;
         }
     }
-
+    
+    /**
+     * Clubhouse
+     */
+     
+   function setParticipent (address _participentAddr,address _referrerAddr)  public {
+        require (participents[_participentAddr].referrerAddr == address(0x0));
+        Participent storage participent = participents[_participentAddr];
+        participent.referrerAddr = _referrerAddr;
+        participentAdds.push(_participentAddr);
+    
+    }
+    
+    function getParticipents () public view returns (address [] memory){
+        return (participentAdds);
+    }
+    
+    
+    function countParticipents () public view returns (uint256){
+        return participentAdds.length ;
+    }
+    
+    function getParticipentsByReferrer (address _referrerAddr) public view returns (uint,address[] memory){
+        uint count = 0;
+        address[] memory _participentAddr = new address[](participentAdds.length);
+        for(uint i=0; i<participentAdds.length; i++){
+         if(participents[participentAdds[i]].referrerAddr==_referrerAddr){
+             _participentAddr[count] = participentAdds[i];
+             count++;
+         }
+        }
+        return (count, _participentAddr);
+    } 
+    
     
     /**
     * send / withdraw _amount to _payee onlyCLevel
