@@ -218,7 +218,7 @@ contract NekoCollectibles is ERC721 {
         require (_generation<4);
         uint256 DNA;
         uint256 manekiPower;
-        (manekiPower,DNA)  = nekoDNA(_machine, _generation, 499999);
+        (manekiPower,DNA)  = nekoDNA(_machine, _generation);
 
         if(_generation<3){
             createNeko(msg.sender, manekiPower, DNA, 5, 0);
@@ -240,7 +240,7 @@ contract NekoCollectibles is ERC721 {
      * New Neko Generation = refNeko's generation + 1
      * verify referral is a premiumCollectorIncentive
      *
-     * Default generation 6, if without referral
+     * Default generation 6, if no referral
      *
      */
      
@@ -254,7 +254,6 @@ contract NekoCollectibles is ERC721 {
         uint256 manekiPower;
         uint256 generation;
         uint256 _newGammaNekoID;
-        uint256 refPower;
 
         Neko storage NEKO = Nekos[_refNekoId];
 
@@ -271,18 +270,15 @@ contract NekoCollectibles is ERC721 {
             generation += 1;
             NEKO.refCount += 1;
             Nekos[_refNekoId].refCount = NEKO.refCount;
-            refPower = Nekos[_refNekoId].power;
+            
+            
             
         } else {
             generation = 6;
             _newGammaNekoID = 0;
-            refPower = 0;
         }
 
-        // genearate Neko DNA
-        (manekiPower,DNA)  = nekoDNA(_machine, generation, refPower);
-        
-        // Mint Neko 
+        (manekiPower,DNA)  = nekoDNA(_machine, generation);
         createNeko(_buyer, manekiPower, DNA, 0, _newGammaNekoID);
         luckyCoin();
 
@@ -322,11 +318,10 @@ contract NekoCollectibles is ERC721 {
         return newNekoId;
     }
 
-    function nekoDNA(uint256 _machine, uint256 _generation, uint256 _refPower) internal view returns ( uint256, uint256){
+    function nekoDNA(uint256 _machine, uint256 _generation) internal view returns ( uint256, uint256){
 
        uint256 DNA;
        uint256 manekiPower;
-       uint256 basePower;
        uint256[] memory generateDNA = new uint256[](5);
 
         /**
@@ -336,22 +331,18 @@ contract NekoCollectibles is ERC721 {
         *  5D = RELATIONSHIP
         *  5D = WISDOM
         *  5D = HEALTH
-        *  --> 0P   > 26P
-        *  6D = MANEKIPOWER (BASE + REF)
-        *  --> 27P  > 32P
+        *  --> 26D
+        *  6D = MANEKIPOWER
+        *  --> 32D
         *
         *  6D = GENERATION
-        *  --> 33P  > 38P
+        *  --> 38D
         *
         *  3D = ORIGIN
         *  4D = PAINTER : Source Code that use to generate art work
         *  4D = SERIES  : New Designs added by batch
-        *  11D = BIRTHDAY
-        *  T = 22D
-        *  --> 39P  > 50P
-        *  
-        *  6D = BASE MANEKIPOWER
-        *  --> 51P  > 56P
+        *  11D = BIRTHDAD
+        *  -->  22D
         */
 
        uint256 energies = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty.add(_machine)))).mod(10**26);
@@ -366,15 +357,13 @@ contract NekoCollectibles is ERC721 {
         generateDNA[3] = energies.div(10**5).mod(100000);
         generateDNA[4] = energies.mod(10**5);
 
-        basePower   = generateDNA[0] + generateDNA[1] + generateDNA[2] + generateDNA[3] + generateDNA[4];
-        manekiPower = _refPower + basePower;
+        manekiPower = generateDNA[0] + generateDNA[1] + generateDNA[2] + generateDNA[3] + generateDNA[4];
 
         DNA = energies;
         
         DNA = DNA.mul(10**6).add(manekiPower);
         DNA = DNA.mul(10**6).add(_generation);
         DNA = DNA.mul(10**22).add(_machine);
-        DNA = DNA.mul(10**6).add(basePower);
 
         return (manekiPower,DNA);
    }
