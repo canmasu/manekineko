@@ -157,16 +157,18 @@ contract NekoCollectibles is ERC721 {
      * LUCKY_COINS - a lucky coin is invited
      * INCENTIVE - incentive sent to premium collector
      * ROLES - a new user is add or updated
+     * ROYALTY - 1. Premium collector , 2. Artist ,  3 Developer 
      */
      
     event BIRTH (address owner, uint256 NekoId, uint256 power, uint256 DNA);
     event WITHDRAWAL (address indexed payee, uint256 amount, uint256 balance);
     event LUCKY_COINS (address indexed luckyWallet, uint256 indexed luckyNeko, uint256 amount, uint256 timestamp);
-    event ARTIST (address indexed payee, uint256 amount, uint256 timestamp);
-    event DEVELOPER (address indexed payee, uint256 amount, uint256 timestamp);
-    event INCENTIVE (address indexed payee, uint256 amount, uint256 timestamp);
+    
+    event INCENTIVE (address indexed payee, uint256 amount,uint256 timestamp);
+    event ARTIST (address indexed payee, uint256 amount,uint256 timestamp);
+    event DEVELOPER (address indexed payee,  uint256 amount,uint256 timestamp);
+    
     event BONUS (address indexed payee, uint256 gammaNekoID, uint256 amount, uint256 timestamp);
-    event ROLES (address user, uint256 role, bool status);
 
 
     function addNewCEO (address _newAddress) external onlyCEO{
@@ -176,7 +178,6 @@ contract NekoCollectibles is ERC721 {
             Status : true
         });
         CLevels.push(newCLevel);
-        emit ROLES (_newAddress,1,true);
     }
 
     function addNewCLevel (address _newAddress) external onlyCEO{
@@ -186,14 +187,12 @@ contract NekoCollectibles is ERC721 {
             Status : true
         });
         CLevels.push(newCLevel);
-        emit ROLES (_newAddress,2,true);
     }
 
     function deactiveCLevel (address _deactiveAddress) external onlyCEO{
         for(uint i=0; i<CLevels.length; i++){
             if(CLevels[i].CLevelAddress== _deactiveAddress){
                 CLevels[i].Status = false;
-                emit ROLES (_deactiveAddress,CLevels[i].Role,false);
             }
         }
     }
@@ -348,13 +347,13 @@ contract NekoCollectibles is ERC721 {
         // Income for Artsits and Developers
         manekiPayout (address(this), payable(artistAddr), artistAmount);
         manekiPayout (address(this), payable(developerAddr), developerAmount);
-        emit ARTIST (artistAddr, artistAmount, block.timestamp);
-        emit DEVELOPER (developerAddr, developerAmount, block.timestamp);
+        emit ARTIST (artistAddr,artistAmount, block.timestamp);
+        emit DEVELOPER (developerAddr,developerAmount, block.timestamp);
     }
 
 
 
-    function createNeko(address _owner, uint256 _power, uint256 _DNA, uint256 _refCount, uint256 _gammaNekoID) private returns (uint256){
+    function createNeko(address _owner, uint256 _power, uint256 _DNA, uint256 _refCount, uint256 _gammaNekoID) private{
 
         require(_owner != address(0));
 
@@ -370,7 +369,7 @@ contract NekoCollectibles is ERC721 {
         super._mint(_owner, newNekoId);
 
         emit BIRTH (_owner,newNekoId, newNeko.power, newNeko.DNA);
-        return newNekoId;
+        //return newNekoId;
     }
 
     function nekoDNA(uint256 _machine, uint256 _generation, uint256 _refPower) private view returns ( uint256, uint256){
@@ -486,8 +485,7 @@ contract NekoCollectibles is ERC721 {
     }
 
     /**
-     * Owned 10 neko to be promoted as Premium Collector
-     * Premium collector eligible to get 0.018 ETH incentive for each referral
+     * Premium Collector - Minimun Owned 10 NFT
      *
      */
 
@@ -500,10 +498,10 @@ contract NekoCollectibles is ERC721 {
             
             //check referer
             if (balanceOf(Contract.getReferrer(_participentAddr)) > 99){
-                // 20%
+                // Premium Diamond Collector 20%
                 _amount = incentiveAmount;
             } else {
-                // 10%
+                // Premium Gold Collector 10%
                 _amount = incentiveAmount/2;
             }
             

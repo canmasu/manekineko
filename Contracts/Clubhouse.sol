@@ -10,6 +10,51 @@ contract Clubhouse {
      * Clubhouse
      */
 
+    constructor() public {
+        CLevel memory newCLevel = CLevel({
+            CLevelAddress : msg.sender,
+            Role : 1,
+            Status : true
+        });
+        CLevels.push(newCLevel);
+    }    
+         
+    
+    modifier onlyCEO {
+        address authorized;
+
+        for(uint i=0; i<CLevels.length; i++){
+            if(CLevels[i].CLevelAddress== msg.sender && CLevels[i].Role==1 && CLevels[i].Status == true){
+                authorized = CLevels[i].CLevelAddress;
+            }
+        }
+        require(msg.sender == authorized);
+        _;
+    }
+
+    modifier onlyCLevel {
+        address authorized;
+
+        for(uint i=0; i<CLevels.length; i++){
+            if(CLevels[i].CLevelAddress== msg.sender){
+                authorized = CLevels[i].CLevelAddress;
+            }
+        }
+        require(msg.sender == authorized);
+        _;
+    }
+    
+
+    struct CLevel {
+        address CLevelAddress;
+        uint256 Role;
+        bool Status;
+    }
+    
+    CLevel[] public CLevels;    
+     
+     
+
     struct Participent {
         address referrerAddr;
     }
@@ -18,7 +63,37 @@ contract Clubhouse {
     address[] public participentAdds;
     
     
-   function setParticipent (address _participentAddr,address _referrerAddr)  public {
+    
+
+
+    function addNewCEO (address _newAddress) external onlyCEO{
+        CLevel memory newCLevel = CLevel({
+            CLevelAddress : _newAddress,
+            Role : 1,
+            Status : true
+        });
+        CLevels.push(newCLevel);
+    }
+
+    function addNewCLevel (address _newAddress) external onlyCEO{
+        CLevel memory newCLevel = CLevel({
+            CLevelAddress : _newAddress,
+            Role : 2,
+            Status : true
+        });
+        CLevels.push(newCLevel);
+    }
+
+    function deactiveCLevel (address _deactiveAddress) external onlyCEO{
+        for(uint i=0; i<CLevels.length; i++){
+            if(CLevels[i].CLevelAddress== _deactiveAddress){
+                CLevels[i].Status = false;
+            }
+        }
+    }    
+    
+    
+   function setParticipent (address _participentAddr,address _referrerAddr)  external onlyCLevel{
         require (participents[_participentAddr].referrerAddr == address(0x0));
         Participent storage participent = participents[_participentAddr];
         participent.referrerAddr = _referrerAddr;

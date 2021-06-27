@@ -29,7 +29,7 @@ import "./Collectibles.sol";
   
 contract PaymentGateway {
     
-    constructor(uint _coinQuantity) public {
+    constructor(address _collectiblesContract, uint _coinQuantity) public {
         CLevel memory newCLevel = CLevel({
             CLevelAddress : msg.sender,
             Role : 1,
@@ -37,7 +37,8 @@ contract PaymentGateway {
         });
         CLevels.push(newCLevel);
         
-        coinQuantity = _coinQuantity;
+        collectiblesContract = _collectiblesContract;
+        coinQuantity         = _coinQuantity;
         
     }    
     
