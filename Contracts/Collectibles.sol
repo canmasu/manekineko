@@ -79,6 +79,8 @@ contract NekoCollectibles is ERC721 {
     address developerAddr;
     
     uint256 manekiPoolSize;
+    uint256 halveMark;
+    
     uint256 royaltyAmount;
     uint256 incentiveAmount;
     uint256 bonusAmount;
@@ -97,7 +99,7 @@ contract NekoCollectibles is ERC721 {
      *
      */
 
-    constructor(IERC20 _nekoContractAddr, address _clubhouseContract, uint256 _manekiPoolSize, address _artistAddr, address _developerAddr) ERC721("Neko Collectibles", "NC") public {
+    constructor(IERC20 _nekoContractAddr, address _clubhouseContract, uint256 _manekiPoolSize, uint256 _halveMark, address _artistAddr, address _developerAddr) ERC721("Neko Collectibles", "NC") public {
         CLevel memory newCLevel = CLevel({
             CLevelAddress : msg.sender,
             Role : 1,
@@ -109,11 +111,16 @@ contract NekoCollectibles is ERC721 {
         
         manekiTokenAddress = _nekoContractAddr;
         manekiPoolSize     = _manekiPoolSize;
+        halveMark          = _halveMark;
+        
         royaltyAmount      = _manekiPoolSize/10*2;
         incentiveAmount    = _manekiPoolSize/10*2;
         bonusAmount        = _manekiPoolSize/10*2;
         artistAmount       = _manekiPoolSize/10*3;
         developerAmount    = _manekiPoolSize/10*1;
+        
+        artistAddr         = _artistAddr;
+        developerAddr      = _developerAddr;
     }
 
 
@@ -148,7 +155,6 @@ contract NekoCollectibles is ERC721 {
      * BIRTH - a new Neko is created
      * WITHDRAWAL - a withdraw is made
      * LUCKY_COINS - a lucky coin is invited
-     * REWARD - a credit recieved from the referral made
      * INCENTIVE - incentive sent to premium collector
      * ROLES - a new user is add or updated
      */
@@ -156,7 +162,8 @@ contract NekoCollectibles is ERC721 {
     event BIRTH (address owner, uint256 NekoId, uint256 power, uint256 DNA);
     event WITHDRAWAL (address indexed payee, uint256 amount, uint256 balance);
     event LUCKY_COINS (address indexed luckyWallet, uint256 indexed luckyNeko, uint256 amount, uint256 timestamp);
-    event REWARD (address indexed payee, uint256 refNekoId, uint256 newNeko, uint256 credit, uint256 timestamp);
+    event ARTIST (address indexed payee, uint256 amount, uint256 timestamp);
+    event DEVELOPER (address indexed payee, uint256 amount, uint256 timestamp);
     event INCENTIVE (address indexed payee, uint256 amount, uint256 timestamp);
     event BONUS (address indexed payee, uint256 gammaNekoID, uint256 amount, uint256 timestamp);
     event ROLES (address user, uint256 role, bool status);
@@ -190,6 +197,35 @@ contract NekoCollectibles is ERC721 {
             }
         }
     }
+    
+    /**
+     *  Maneki Pool
+     * 
+     */
+     
+     function setManekiPool() private {
+        // set halve Maneki Pool for every 100,000 NFT minted 
+        // increase the halveMark
+        // 10 > 10000 , 2 > 16000
+        
+        require (totalSupply() > halveMark);
+        
+        if (halveMark == 10){
+            halveMark += 2;
+        } else {
+            halveMark = halveMark*16/10;
+        }
+        
+        manekiPoolSize = manekiPoolSize/2;
+        royaltyAmount      = manekiPoolSize/10*2;
+        incentiveAmount    = manekiPoolSize/10*2;
+        bonusAmount        = manekiPoolSize/10*2;
+        artistAmount       = manekiPoolSize/10*3;
+        developerAmount    = manekiPoolSize/10*1;
+        
+     }
+    
+    
     /**
      * mintRootNeko  - onlyCLevel able to mint
      * 1st Generation as alpha and 2nd Generation as beta
@@ -284,6 +320,16 @@ contract NekoCollectibles is ERC721 {
         
         // Mint Neko 
         createNeko(_buyer, manekiPower, DNA, 0, _newGammaNekoID);
+        
+        // Maneki Cycle 
+        // Halve Maneki Pool for each 100,000 NFT minted
+        if (totalSupply() > halveMark){
+            // update new halved Maneki Pools size
+            setManekiPool();
+            
+        }
+        
+        // Maneki Coins 
         luckyCoin();
 
         // Bonus for GammaNeko
@@ -293,17 +339,22 @@ contract NekoCollectibles is ERC721 {
         
         // Incenttive for Referrer 
         // >>  check the clublchouse
-        
         Clubhouse Contract = Clubhouse(clubhouseContract);
 
-        if (Contract.getReferrer(msg.sender) == address(0x0)) {
+        if (Contract.getReferrer(msg.sender) != address(0x0)) {
             premiumCollectorIncentive(msg.sender);
         }
+        
+        // Income for Artsits and Developers
+        manekiPayout (address(this), payable(artistAddr), artistAmount);
+        manekiPayout (address(this), payable(developerAddr), developerAmount);
+        emit ARTIST (artistAddr, artistAmount, block.timestamp);
+        emit DEVELOPER (developerAddr, developerAmount, block.timestamp);
     }
 
 
 
-    function createNeko(address _owner, uint256 _power, uint256 _DNA, uint256 _refCount, uint256 _gammaNekoID) internal returns (uint256){
+    function createNeko(address _owner, uint256 _power, uint256 _DNA, uint256 _refCount, uint256 _gammaNekoID) private returns (uint256){
 
         require(_owner != address(0));
 
@@ -322,7 +373,7 @@ contract NekoCollectibles is ERC721 {
         return newNekoId;
     }
 
-    function nekoDNA(uint256 _machine, uint256 _generation, uint256 _refPower) internal view returns ( uint256, uint256){
+    function nekoDNA(uint256 _machine, uint256 _generation, uint256 _refPower) private view returns ( uint256, uint256){
 
        uint256 DNA;
        uint256 manekiPower;
@@ -367,7 +418,7 @@ contract NekoCollectibles is ERC721 {
         generateDNA[4] = energies.mod(10**5);
 
         basePower   = generateDNA[0] + generateDNA[1] + generateDNA[2] + generateDNA[3] + generateDNA[4];
-        manekiPower = _refPower + basePower;
+        manekiPower = (_refPower/2) + basePower;
 
         DNA = energies;
         
@@ -385,7 +436,7 @@ contract NekoCollectibles is ERC721 {
      *
      */
 
-    function luckyCoin() internal returns(bool){
+    function luckyCoin() private returns(bool){
         address payable luckyWallet;
         address payable ownerWallet;
         
@@ -424,7 +475,7 @@ contract NekoCollectibles is ERC721 {
           _amount = _nekoPower[j].div(_sumPower);
           //_amount = _amount.mul(royaltyAmount);
           
-          // Tranfers Maneki Coins to the lucky neko
+          // Tranfers Maneki Coins to the lucky neko's owner
           manekiPayout (address(this), luckyWallet, _amount);
           
         
@@ -467,11 +518,15 @@ contract NekoCollectibles is ERC721 {
         }
     }
     
+    
     /** 
      * send as gitf to a friend (walletAddress)
      */
     function sendAsGift (address receiverAddrs , uint256 tokenId) public {
         transferFrom(msg.sender, receiverAddrs, tokenId);
+        
+        Clubhouse Contract = Clubhouse(clubhouseContract);
+        Contract.setParticipent(receiverAddrs,msg.sender);
     }
     
     /**
@@ -479,7 +534,7 @@ contract NekoCollectibles is ERC721 {
      * Gamma collector eligible to get 0.01 ETH Bonus for each referral
      *
      */
-    function gammaCollectorBonus(uint256 _GammaNekoID) internal{
+    function gammaCollectorBonus(uint256 _GammaNekoID) private{
             address payable _payee;
             uint256 _amount = bonusAmount;
             _payee = payable(ownerOf(_GammaNekoID));
@@ -491,7 +546,7 @@ contract NekoCollectibles is ERC721 {
 
     }
 
-    function manekiPayout(address _contractAdds, address payable _payee, uint256 _amount) internal{
+    function manekiPayout(address _contractAdds, address payable _payee, uint256 _amount) private{
         
             manekiTokenAddress.approve(_contractAdds,_amount);
             manekiTokenAddress.allowance(_contractAdds,_payee);
@@ -500,7 +555,7 @@ contract NekoCollectibles is ERC721 {
 
 
     /**
-     * etrieve a specific Neko's details.
+     * retrieve a specific Neko's details.
      * NekoId ID of the Neko who's details will be retrieved
      *
      */
@@ -547,7 +602,7 @@ contract NekoCollectibles is ERC721 {
         emit WITHDRAWAL (_payee, _amount, address(this).balance);
     }
     
-    function totalSupply() external view returns (uint){
+    function totalSupply() public view returns (uint){
         return Nekos.length;
     }
 
@@ -574,8 +629,8 @@ contract NekoCollectibles is ERC721 {
         manekiPoolSize = _manekiPoolSize;
      }
 
-    function viewSetting () public view returns (address,address,uint256,uint256,uint256,uint256,uint256,uint256){
-        return (artistAddr,developerAddr,manekiPoolSize,royaltyAmount,incentiveAmount,bonusAmount,artistAmount,developerAmount);
+    function getManekiPool () external view returns (uint256,uint256,uint256){
+        return (manekiPoolSize,halveMark,royaltyAmount);
     }
      
 }
