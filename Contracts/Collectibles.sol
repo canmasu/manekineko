@@ -340,8 +340,8 @@ contract NekoCollectibles is ERC721 {
         // >>  check the clublchouse
         Clubhouse Contract = Clubhouse(clubhouseContract);
 
-        if (Contract.getReferrer(msg.sender) != address(0x0)) {
-            premiumCollectorIncentive(msg.sender);
+        if (Contract.getReferrer(_buyer) != address(0x0)) {
+            premiumCollectorIncentive(_buyer);
         }
         
         // Income for Artsits and Developers
@@ -524,7 +524,10 @@ contract NekoCollectibles is ERC721 {
         transferFrom(msg.sender, receiverAddrs, tokenId);
         
         Clubhouse Contract = Clubhouse(clubhouseContract);
-        Contract.setParticipent(receiverAddrs,msg.sender);
+
+        if (Contract.getReferrer(receiverAddrs) == address(0x0)) {
+            Contract.setParticipent(receiverAddrs,msg.sender);
+        }    
     }
     
     /**
