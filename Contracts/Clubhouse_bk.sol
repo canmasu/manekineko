@@ -55,13 +55,12 @@ contract Clubhouse {
      
      
 
-    struct Member {
-        address Referrer;
+    struct Participent {
+        address referrerAddr;
     }
     
-    mapping (address => Member) public members;
-    
-    address[] public Members;
+    mapping (address => Participent) public participents;
+    address[] public participentAdds;
     
     
     
@@ -94,36 +93,35 @@ contract Clubhouse {
     }    
     
     
-   function addMember (address _member)  external onlyCLevel{
-        require (members[_member].Referrer== address(0x0));
-        members[_member].Referrer = msg.sender;
-        Members.push(_member);
+   function setParticipent (address _participentAddr,address _referrerAddr)  external onlyCLevel{
+        require (participents[_participentAddr].referrerAddr == address(0x0));
+        Participent storage participent = participents[_participentAddr];
+        participent.referrerAddr = _referrerAddr;
+        participentAdds.push(_participentAddr);
+    
     }
-    function getMembers () public view returns (address [] memory) {
-        
-        address[] memory _members = new address[](Members.length);
+    
+    function getParticipents () public view returns (address [] memory){
+        return (participentAdds);
+    }
+    
+    
+    function countParticipents () public view returns (uint256){
+        return participentAdds.length ;
+    }
+    
+    function getParticipentsByReferrer (address _referrerAddr) public view returns (uint,address[] memory){
         uint count = 0;
-        
-        for (uint i=0; i< Members.length ; i++){
-            if(getReferrer(Members[i]) == msg.sender) {
-                _members[count] = Members[i];
-                count ++;
-            }
+        address[] memory _participentAddr = new address[](participentAdds.length);
+        for(uint i=0; i<participentAdds.length; i++){
+         if(participents[participentAdds[i]].referrerAddr==_referrerAddr){
+             _participentAddr[count] = participentAdds[i];
+             count++;
+         }
         }
-        return _members;
-    }
-    
-    
-    function getAllMembers () public view returns (address [] memory){
-        return (Members);
-    }
-    
-    
-    function countMembers () public view returns (uint256){
-        return Members.length ;
-    }
-    
-    function getReferrer (address _member) public view returns (address) {
-        return members[_member].Referrer;
+        return (count, _participentAddr);
+    } 
+    function getReferrer (address _participentAddr) public view returns (address) {
+        return participents[_participentAddr].referrerAddr;
     }
 }

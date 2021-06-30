@@ -1,9 +1,65 @@
 const NekoCollectibleABI = 
 [
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "_nekoContractAddr",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_clubhouseContract",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_manekiPoolSize",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_halveMark",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_artistAddr",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_developerAddr",
+				"type": "address"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "payee",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "ARTIST",
+		"type": "event"
 	},
 	{
 		"anonymous": false,
@@ -129,8 +185,27 @@ const NekoCollectibleABI =
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "refNekoId",
+				"name": "amount",
 				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "DEVELOPER",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "payee",
+				"type": "address"
 			},
 			{
 				"indexed": false,
@@ -177,99 +252,6 @@ const NekoCollectibleABI =
 			}
 		],
 		"name": "LUCKY_COINS",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "payee",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "freeNekoID",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "credit",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "REDEMPTION",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "payee",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "refNekoId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "newNeko",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "credit",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "REWARD",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "role",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "status",
-				"type": "bool"
-			}
-		],
-		"name": "ROLES",
 		"type": "event"
 	},
 	{
@@ -481,6 +463,29 @@ const NekoCollectibleABI =
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "getManekiPool",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -567,19 +572,6 @@ const NekoCollectibleABI =
 				"internalType": "uint256",
 				"name": "_machine",
 				"type": "uint256"
-			}
-		],
-		"name": "mintFreeNeko",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_machine",
-				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
@@ -641,38 +633,6 @@ const NekoCollectibleABI =
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "referrals",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "credit",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "rewardCredit",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
 				"name": "from",
 				"type": "address"
 			},
@@ -716,6 +676,24 @@ const NekoCollectibleABI =
 			}
 		],
 		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "receiverAddrs",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "sendAsGift",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -773,32 +751,12 @@ const NekoCollectibleABI =
 	{
 		"inputs": [
 			{
-				"internalType": "contract IERC20",
-				"name": "_manekiTokenAddress",
-				"type": "address"
-			},
-			{
 				"internalType": "uint256",
-				"name": "_numberOfLuckyNeko",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_royaltyAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_incentiveAmount",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_bonusAmount",
+				"name": "_manekiPoolSize",
 				"type": "uint256"
 			}
 		],
-		"name": "setManekiToken",
+		"name": "setManekiPool",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

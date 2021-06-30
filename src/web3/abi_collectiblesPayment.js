@@ -1,7 +1,18 @@
 const CollectiblePaymentABI = 
 [
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_collectiblesContract",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_coinQuantity",
+				"type": "uint256"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},

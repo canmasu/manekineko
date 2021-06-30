@@ -11,6 +11,7 @@ import Analytics from '../components/analytics.vue'
 import Contact from '../components/contact.vue'
 import Token from '../components/token.vue'
 import Mint from '../components/mint.vue'
+import Clubhouse from '../components/clubhouse.vue'
 
 
 Vue.use(VueRouter)
@@ -26,6 +27,7 @@ const routes = [
       {path: '/trade', component:Trade },
       {path: '/launchpad', component:Launchpad },
       {path: '/manekineko', component:Manekineko },
+      {path: '/clubhouse', component:Clubhouse },
       {path: '/mint', component:Mint },
       {path: '/analytics', component:Analytics },
       {path: '/contact', component:Contact },

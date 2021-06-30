@@ -81,7 +81,7 @@ import getWeb3 from '../web3/web3';
 
 // Contract : Exchange
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0x20C15FBD845F5117165cf508cbe57598765B41b4';
+const contract_exchange = '0x14DdB7A447dc0959537468daC09c7bC71ea6c78C';
 
 // Contract : ERC20 - $NEKO
 import abi_neko from '../web3/abi_neko';
@@ -166,7 +166,7 @@ buyNFT (){
 
 },
 payWithETH () {
-    this.contract.exchange.methods.buy_byETH(this.buyForm.DealID,this.buyForm.TokenID).send({
+    this.contract.exchange.methods.buy_byETH(this.buyForm.DealID,this.buyForm.TokenID,'0x0000000000000000000000000000000000000000').send({
       from: this.account,
       value: this.buyForm.Price
     }).then((res) => {
@@ -185,7 +185,8 @@ approve(){
 
 },
 paymentConfirm() {
-    this.contract.exchange.methods.buy_byERC20(this.buyForm.DealID,this.buyForm.TokenID).send({
+    console.log('in payment confirm');
+    this.contract.exchange.methods.buy_byERC20(this.buyForm.DealID,this.buyForm.TokenID,'0x0000000000000000000000000000000000000000').send({
       from: this.account
     }).then((res) => {
         console.log('buy NFT success :' ,res);

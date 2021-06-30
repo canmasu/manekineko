@@ -14,31 +14,35 @@
                     <span slot="title">Home</span>
                 </el-menu-item>
 
+                <el-menu-item index="trade">
+                    <i class="iconfont icon-exchange"></i>
+                    <span slot="title">Trade</span>
+                </el-menu-item>
+
+                <el-menu-item index="mint">
+                    <i class="iconfont icon-dollar"></i>
+                    <span slot="title">Mint</span>
+                </el-menu-item>
+
                 <el-menu-item index="wallet">
                     <i class="iconfont icon-iconwallet"></i>
                     <span slot="title">Wallet</span>
                 </el-menu-item>
 
-                <el-menu-item index="trade">
-                    <i class="iconfont icon-exchange"></i>
-                    <span slot="title">Trade NFT</span>
+                <el-menu-item index="manekineko">
+                    <i class="iconfont icon-dollar"></i>
+                    <span slot="title">Maneki</span>
+                </el-menu-item>
+
+                <el-menu-item index="clubhouse">
+                    <i class="iconfont icon-dollar"></i>
+                    <span slot="title">Clubhouse</span>
                 </el-menu-item>
 
 
                 <el-menu-item index="launchpad">
                     <i class="iconfont icon-launch"></i>
                     <span slot="title">Launchpad</span>
-                </el-menu-item>
-
-
-                <el-menu-item index="manekineko">
-                    <i class="iconfont icon-dollar"></i>
-                    <span slot="title">Maneki $NEKO</span>
-                </el-menu-item>
-
-                <el-menu-item index="mint">
-                    <i class="iconfont icon-dollar"></i>
-                    <span slot="title">Buy & Mint</span>
                 </el-menu-item>
 
                 <el-menu-item index="analytics">

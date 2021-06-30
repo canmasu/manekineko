@@ -81,12 +81,12 @@
 import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_nekocollectible';
-const contract_collectible = '0x9CCD560e93C2be416edE43C4E97941b7b443b9CE';
+const contract_collectible = '0x4C5D2D4CC9c2f8D7e8A56805E718029824d75A43';
 
 
 // Contract : Collectibles Paymnet
 import abi_payment from '../web3/abi_collectiblesPayment';
-const contract_payment = '0x5c573535C3E0e9deB802D884F4D4CA766A85b355';
+const contract_payment = '0xAFE7b8778E570b11fdD8eC5d9BEd2f0938d1adE3';
 
 
 // Contract : ERC20 - $NEKO
@@ -300,7 +300,8 @@ export default {
             this.payment.tokens.push({
                 tokenAddress: '0x0000000000000000000000000000000000001002',
                 tokenSymbol: 'BNB',
-                tokenQuantity: (1*10**17).toString(),
+                //tokenQuantity: (1*10**17).toString(),
+                tokenQuantity : 100000000,
                 tokenStatus: true
             });
                 

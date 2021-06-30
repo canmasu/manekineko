@@ -23,15 +23,34 @@
             </template>
 
             <template slot-scope="scope">
-                <router-link :to="'/token/' +scope.row.tokenID">
-                    <el-button size="mini"> View </el-button>
-                </router-link>
+                    <el-button size="mini"> <router-link :to="'/token/' +scope.row.tokenID">View </router-link></el-button>   
+                    <el-button size="mini" type="info" @click="sendGift(scope.row.tokenID)"> Gift </el-button>
                     <el-button size="mini" type="primary" @click="wantToSell(scope.row.tokenID)"> Sell </el-button>
             </template>
 
         </el-table-column>   
              
     </el-table>
+
+
+    <el-dialog title="Send as gift" :visible.sync="dialog.sendGift">
+        <el-form :model="giftForm">
+            <el-form-item label="NFT" :label-width="formLabelWidth">
+            <el-select v-model="giftForm.tokenID" placeholder="Select NFT">
+                <el-option :key="'neko-'+giftForm.tokenID" :label="'招き猫 #'+giftForm.tokenID" :value="giftForm.tokenID"></el-option>
+            </el-select>
+            </el-form-item>
+
+            <el-form-item label="Receiver" :label-width="formLabelWidth">
+            <el-input v-model="giftForm.receiverAddr" placeholder="(BSC) Wallet Address"></el-input>
+            </el-form-item>
+
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialog.sendGift = false">Cancel</el-button>
+            <el-button type="primary" @click="approveSendGift()"> Approve </el-button>
+        </div>
+    </el-dialog>
 
     
     <el-dialog title="List this NFT to exchange" :visible.sync="dialog.approveToExchange">
@@ -83,10 +102,10 @@
 import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_nekocollectible';
-const contract_collectible = '0x9CCD560e93C2be416edE43C4E97941b7b443b9CE';
+const contract_collectible = '0x4C5D2D4CC9c2f8D7e8A56805E718029824d75A43';
 
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0x20C15FBD845F5117165cf508cbe57598765B41b4';
+const contract_exchange = '0x14DdB7A447dc0959537468daC09c7bC71ea6c78C';
 
 
 export default {
@@ -114,7 +133,8 @@ export default {
             },
             dialog :{
                 approveToExchange : false,
-                offerForm : false
+                offerForm : false,
+                sendGift : false,
             },
             approvalForm: {
                 tokenID: ''
@@ -124,6 +144,10 @@ export default {
                 price: '',
                 currency:'',
                 buyer:''
+            },
+            giftForm : {
+                tokenID: '',
+                receiverAddr:''
             },
             formLabelWidth: '120px'
 
@@ -181,8 +205,22 @@ export default {
             this.approvalForm.tokenID = _tokenID;
             this.dialog.approveToExchange = true;
         },
+        sendGift (_tokenID) {
+            this.giftForm.tokenID = _tokenID;
+            this.dialog.sendGift = true;
+        },
+        approveSendGift (){   
+            // Approve :to send this NFT as a gift to this address
+            console.log('sender', this.account);
+            console.log('reciever', this.giftForm.receiverAddr);
+            this.contract.collectibles.methods.sendAsGift(this.giftForm.receiverAddr, this.giftForm.tokenID).send({
+            from: this.account,
+            }).then((res) => {
+                console.log('approve gift sending',res);
+                this.dialog.sendGift = false;
+            })
 
-
+        },
         approveTransfer (){
             // Approve : this NFT transfer to Exchange
             this.contract.collectibles.methods.approve(contract_exchange , this.approvalForm.tokenID).send({
