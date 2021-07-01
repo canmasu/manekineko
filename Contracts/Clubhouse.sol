@@ -94,13 +94,14 @@ contract Clubhouse {
     }    
     
     
-   function addMember (address _member)  external onlyCLevel{
-        require (members[_member].Referrer== address(0x0));
-        members[_member].Referrer = msg.sender;
+   function addMember (address _member, address _referrer)  public onlyCLevel{
+        require (getReferrer(_member)== address(0x0) && _member!=_referrer);
+        members[_member].Referrer = _referrer;
         Members.push(_member);
     }
-    function getMembers () public view returns (address [] memory) {
-        
+    
+    
+    function getMembers () public view returns (address [] memory, uint256) {
         address[] memory _members = new address[](Members.length);
         uint count = 0;
         
@@ -110,7 +111,7 @@ contract Clubhouse {
                 count ++;
             }
         }
-        return _members;
+        return (_members, count);
     }
     
     
@@ -126,4 +127,5 @@ contract Clubhouse {
     function getReferrer (address _member) public view returns (address) {
         return members[_member].Referrer;
     }
+
 }

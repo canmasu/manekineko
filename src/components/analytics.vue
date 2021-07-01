@@ -9,7 +9,7 @@
 <script>
 
 import getWeb3 from '../web3/web3';
-import contractAbi from '../web3/abi_nekocollectible';
+import contractAbi from '../web3/abi_collectible';
 const contractAddressCollectibles = '0x9CCD560e93C2be416edE43C4E97941b7b443b9CE';
 
 export default {

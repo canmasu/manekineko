@@ -11,14 +11,14 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts@4.1.0/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts@4.1.0/token/ERC20/IERC20.sol";
-import "./Collectibles.sol";
+import "./Clubhouse.sol";
 
 contract Exchange {
 
-    constructor (IERC721 _NFTAddress, IERC20 _NekoAddress, address _collectiblesContract) public {
+    constructor (IERC721 _NFTAddress, IERC20 _NekoAddress, address _clubhouseContract) public {
         NFTAddress           = _NFTAddress;
         NEKOAddress          = _NekoAddress;
-        collectiblesContract = _collectiblesContract;
+        clubhouseContract    = _clubhouseContract;
     }
 
     struct Deal { 
@@ -33,8 +33,7 @@ contract Exchange {
     IERC721 NFTAddress;
     IERC20  NEKOAddress;
 
-    
-    address collectiblesContract;
+    address clubhouseContract;
     
     event BUY        (address indexed _seller, address indexed _buyer, uint256 indexed _tokenID, uint256 price);
     event OFFER      (address indexed _seller, uint256 _tokenID, uint256 price);
@@ -108,7 +107,7 @@ contract Exchange {
         return _tokenID;
     } 
     
-    
+    // Without _referrerAddr, 0x0
     function buy_byERC20 (uint256 _dealID, uint256 _tokenID, address _referrerAddr) external returns (uint256){
         // buy NFT pay by ERC20 token
         require(Deals[_dealID].TokenID == _tokenID &&Deals[_dealID].Status == true && Deals[_dealID].Currency== false);
@@ -134,10 +133,11 @@ contract Exchange {
         return _tokenID;
     } 
     function signupClubhouse (address _participentAddr,address _referrerAddr) internal {
-        NekoCollectibles Contract = NekoCollectibles(collectiblesContract);
+        
+        Clubhouse Contract = Clubhouse(clubhouseContract);
 
-        if (Contract.getReferrer(receiverAddrs) == address(0x0)) {
-            Contract.setParticipent(_participentAddr,_referrerAddr);
+        if (Contract.getReferrer(_participentAddr) == address(0x0)) {
+            Contract.addMember(_participentAddr,_referrerAddr);
         }
     }
     

@@ -2,8 +2,12 @@
     <div> 
         <h1> Clubhouse </h1>
         <el-card>
-            <div> club mate :</div>
-            {{this.clubmate}}
+            <div>Members:</div>
+            <el-table :data="members" stripe style="width: 100%">
+                    <el-table-column prop="address" label="Wallet Address" > </el-table-column>
+                    <el-table-column prop="balance" label="Minted" > </el-table-column>   
+            </el-table>
+
         </el-card>
     </div>
 </template>
@@ -13,7 +17,10 @@
 import getWeb3 from '../web3/web3';
 
 import abi_clubhouse from '../web3/abi_clubhouse';
-const contract_clubhouse = '0x0dB762C6F50fe480B269EBC48bb50F60f7460c58';
+const contract_clubhouse = '0x0BE6Cc56028bFE2459dD573e8ffE1419157d214C';
+
+import abi_collectible from '../web3/abi_collectible';
+const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
 
 export default {
     data(){
@@ -22,7 +29,7 @@ export default {
             contract :{
                 clubhouse:null
             },
-            clubmate :[]
+            members :[]
         
         }
     },
@@ -34,11 +41,14 @@ export default {
                 //connect Contracts clubhouse, 
                 this.contract.clubhouse = new this.web3.eth.Contract(abi_clubhouse, contract_clubhouse);
 
+                //connect Contracts Collectibles, 
+                this.contract.collectibles = new this.web3.eth.Contract(abi_collectible, contract_collectible);
+
                 //get current signed wallet address
                 this.web3.eth.getAccounts().then((accounts) => {
                     [this.account] = accounts;
 
-                this.getClubmate();
+                this.getMembers();
 
                 }).catch((err) => {
                     console.log(err, 'err!!');
@@ -50,18 +60,32 @@ export default {
             }
     },
     methods :{
-        getClubmate (){        
-            this.contract.clubhouse.methods.getParticipentsByReferrer(this.account).call({
+        getMembers (){        
+
+            this.contract.clubhouse.methods.getMembers().call({
                 from: this.account,
             }).then((res) => {
-            this.clubmate = res;
-            console.log('List of club mate :', res);
 
+            for(let i=0; i< res[0].length ; i++){
+                if( res[0][i]!= '0x0000000000000000000000000000000000000000'){
+
+                    this.contract.collectibles.methods.balanceOf(res[0][i]).call({
+                        from: this.account,
+                    }).then((bal) => {
+
+                        this.members.push({
+                            address: res[0][i],
+                            balance: bal
+                        });
+
+                    })
+                }
+            }
             }).catch((err) => {
                 console.log(err, 'err');
             });
 
-        },
+        }
 
     }
 }

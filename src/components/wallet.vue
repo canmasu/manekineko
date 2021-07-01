@@ -1,5 +1,6 @@
 <template>
     <div>
+    <el-card>
         <div> Pass in input: address(wallet) => below details, mainly is TESTIMONAL purpose </div>
         <div> Summary </div>
         <div> BNB Balance , Neko Balance, other accepted coin balance </div>
@@ -11,21 +12,22 @@
 
 
 
-
-    <el-table  :data="NFTList.filter(data => !search || data.tokenID.includes(search))" stripe style="width: 100%">
-        <el-table-column prop="date" label="Date" width="180"> </el-table-column>
-        <el-table-column prop="tokenID" label="招き猫 #" width="180"> </el-table-column>
-        <el-table-column prop="tokenDNA" label="DNA"> </el-table-column>
-
-        <el-table-column align="right">
-            <template  slot="header">
-                <el-input v-model="search" size="mini" placeholder="Token ID"/>
-            </template>
-
+    <el-table  :data="NFTs.filter(data => !search || data.id.toLowerCase().includes(search.toLowerCase()))" stripe style="width: 100%">
+        <el-table-column prop="url" label="url">
             <template slot-scope="scope">
-                    <el-button size="mini"> <router-link :to="'/token/' +scope.row.tokenID">View </router-link></el-button>   
-                    <el-button size="mini" type="info" @click="sendGift(scope.row.tokenID)"> Gift </el-button>
-                    <el-button size="mini" type="primary" @click="wantToSell(scope.row.tokenID)"> Sell </el-button>
+                <img :src="scope.row.url"/>
+            </template>
+        </el-table-column>
+        <el-table-column prop="id" label="招き猫 #"> </el-table-column>
+        <el-table-column prop="gen" label="Generation"> </el-table-column>
+        <el-table-column prop="DNA" label="DNA"> </el-table-column>
+        <el-table-column prop="power" label="power"> </el-table-column>
+
+        <el-table-column align="right" :min-width="120">
+            <template slot-scope="scope">
+                    <el-button size="mini"> <router-link :to="'/token/' +scope.row.id+ '/0x0'">View </router-link></el-button>   
+                    <el-button size="mini" type="info" @click="sendGift(scope.row.id)"> Gift </el-button>
+                    <el-button size="mini" type="primary" @click="wantToSell(scope.row.id)"> Sell </el-button>
             </template>
 
         </el-table-column>   
@@ -93,7 +95,7 @@
             <el-button type="primary" @click="makeAnOffer()"> Confirm </el-button>
         </div>
     </el-dialog>    
-
+    </el-card>
     </div>
 </template>
 
@@ -101,11 +103,11 @@
 
 import getWeb3 from '../web3/web3';
 
-import abi_collectible from '../web3/abi_nekocollectible';
-const contract_collectible = '0x4C5D2D4CC9c2f8D7e8A56805E718029824d75A43';
+import abi_collectible from '../web3/abi_collectible';
+const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
 
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0x14DdB7A447dc0959537468daC09c7bC71ea6c78C';
+const contract_exchange = '0xe2091F5439e031033a358C0E8Fa90c5dD6ad85a3';
 
 
 export default {
@@ -124,8 +126,7 @@ export default {
                 supply:0,
                 balance:0
             },
-            // date, tokenID, tokenDNA
-            NFTList :[],
+            NFTs :[],
             search: '',
             contract :{
                 collectibles:null,
@@ -183,18 +184,42 @@ export default {
     },
     methods :{
         getNFTOwned (){        
+
+            // retrive owned NFTs
             this.contract.collectibles.methods.ownedNekos().call({
                 from: this.account,
             }).then((res) => {
 
-            for(let i=0; i< res.length ; i++){
-                this.NFTList.push({
-                    date: '1st July 2021',
-                    tokenID: res[i],
-                    tokenDNA: '100 '+ i
+            for (let i = 0; i < res.length; i += 1) {
+                // retrive NFT Details
+                this.contract.collectibles.methods.getNekoDetails(res[i]).call({
+                    from: this.account,
+                }).then((Neko) => {
+                    var generation = parseInt(Neko[2].substr(32, 6));
+                    var gen_Display = 0;
+
+                    if (generation<6){
+                        if(generation==1) { gen_Display = "α" }
+                        if(generation==2) { gen_Display = "β" }
+                        if(generation==3) { gen_Display = "γ" }
+                        if(generation==4) { gen_Display = "δ" }
+                        if(generation==5) { gen_Display = "ε" }
+                    } else {
+                        gen_Display = generation;
+                    }
+
+                    this.NFTs.push({
+                        id: Neko[0],
+                        power: Neko[1],
+                        DNA: Neko[2],
+                        url: 'https://harvestcamasu.com/cryptoArtist/neko/' + Neko[0] + '.svg',
+                        gen : gen_Display,
+                    });
+
+                }).catch((err) => {
+                    console.log(err, 'err');
                 });
             }
-            console.log('List of NFT owned :', res);
 
             }).catch((err) => {
                 console.log(err, 'err');

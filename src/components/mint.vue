@@ -52,15 +52,6 @@
         </el-dialog>
 
 
-        <el-dialog title="Step 2" :visible.sync="dialogAllowance">
-        <el-form :model="form">
-            <span>Required to allow the Fund use from your wallet</span>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="allowancePayment()">Confirm</el-button>
-        </div>
-        </el-dialog>
-
         <el-dialog title="Step 3" :visible.sync="dialogMint">
         <el-form :model="form">
             <span>Let's mint your NFT</span>
@@ -80,13 +71,13 @@
 
 import getWeb3 from '../web3/web3';
 
-import abi_collectible from '../web3/abi_nekocollectible';
-const contract_collectible = '0x4C5D2D4CC9c2f8D7e8A56805E718029824d75A43';
+import abi_collectible from '../web3/abi_collectible';
+const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
 
 
 // Contract : Collectibles Paymnet
-import abi_payment from '../web3/abi_collectiblesPayment';
-const contract_payment = '0xAFE7b8778E570b11fdD8eC5d9BEd2f0938d1adE3';
+import abi_payment from '../web3/abi_payment';
+const contract_payment = '0x1a547E41d23de5cC3E0Ef53c5e61D951A6566fB4';
 
 
 // Contract : ERC20 - $NEKO
@@ -122,7 +113,6 @@ export default {
       dialogTableVisible: false,
       dialogFormVisible: false,
       dialogApprove : false,
-      dialogAllowance: false,
       dialogMint:false,
       form: {
         guardian: '',
@@ -214,18 +204,8 @@ export default {
             console.log('approve ',res);
             
             this.dialogApprove = false;
-            this.dialogAllowance = true;
-            //this.allowancePayment ();
-        })
-    },
-    async allowancePayment (){
-        // Allawance : Confirm the approved amount to the beneficial
-        await this.contract.ERC20.methods.allowance(this.account,contract_payment).send({
-        from: this.account,
-        }).then((res) => {
-            console.log('allowance',res);
-            this.dialogAllowance = false;
             this.dialogMint = true;
+            //this.allowancePayment ();
         })
     },
     async payByERC20Token ( _tokenAddress, _machine, _refNekoId){

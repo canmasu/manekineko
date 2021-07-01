@@ -21,8 +21,8 @@
 
 
 import getWeb3 from '../web3/web3';
-import abi_collectible from '../web3/abi_nekocollectible';
-const contract_collectible = '0x9CCD560e93C2be416edE43C4E97941b7b443b9CE';
+import abi_collectible from '../web3/abi_collectible';
+const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
 
 
 export default ({

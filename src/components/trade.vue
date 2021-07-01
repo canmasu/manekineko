@@ -1,6 +1,6 @@
 <template>
     <div class="sales_container">
-
+    <el-card>
       <div> Decenterlized NFT Trading 
       NFTs Valuation 
       Select NFT > Payment Method > Buy
@@ -9,6 +9,11 @@
 
 
     <el-table  :data="deals.filter(data => !search || data.TokenID.includes(search))" stripe style="width: 100%">
+        <el-table-column prop="url" label="url">
+            <template slot-scope="scope">
+                <img :src="scope.row.url"/>
+            </template>
+        </el-table-column>
         <el-table-column prop="DealID" label="Deal ID" > </el-table-column>
         <el-table-column prop="Seller" label="Seller" > </el-table-column>
         <el-table-column prop="TokenID" label="招き猫 #"> </el-table-column>             
@@ -22,9 +27,16 @@
             </template>
 
             <template slot-scope="scope">
-                <router-link :to="'/token/' +scope.row.TokenID">
-                    <el-button size="mini"> View </el-button>
-                </router-link>
+                    <el-button size="mini"> 
+                      <router-link :to="'/token/' +scope.row.TokenID +'/0x0'"> View </router-link>
+                    </el-button>
+
+
+                    <el-button size="mini"> 
+                      <router-link :to="'/token/' +scope.row.TokenID + '/' + account"> share </router-link>
+                    </el-button>
+
+                
                     <el-button size="mini" type="danger" 
                         @click="wantToBuy(
                           scope.row.DealID, 
@@ -70,8 +82,7 @@
             <el-button type="primary" @click="paymentConfirm()"> Confirm </el-button>
         </div>
     </el-dialog>
-
-
+    </el-card>
     </div>
 </template>
 
@@ -81,7 +92,7 @@ import getWeb3 from '../web3/web3';
 
 // Contract : Exchange
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0x14DdB7A447dc0959537468daC09c7bC71ea6c78C';
+const contract_exchange = '0xe2091F5439e031033a358C0E8Fa90c5dD6ad85a3';
 
 // Contract : ERC20 - $NEKO
 import abi_neko from '../web3/abi_neko';
@@ -228,7 +239,8 @@ getTotalDeals(){
                   TokenID: res[2],
                   Price: res[3],
                   Currency : _currency,
-                  Status : _status
+                  Status : _status,
+                  url: 'https://harvestcamasu.com/cryptoArtist/neko/' + res[2] + '.svg',
               });
             }
         

@@ -37,6 +37,43 @@ const contractAbiClubhouse =
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "Members",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_member",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_referrer",
+				"type": "address"
+			}
+		],
+		"name": "addMember",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "_newAddress",
 				"type": "address"
@@ -62,7 +99,7 @@ const contractAbiClubhouse =
 	},
 	{
 		"inputs": [],
-		"name": "countParticipents",
+		"name": "countMembers",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -88,7 +125,7 @@ const contractAbiClubhouse =
 	},
 	{
 		"inputs": [],
-		"name": "getParticipents",
+		"name": "getAllMembers",
 		"outputs": [
 			{
 				"internalType": "address[]",
@@ -100,24 +137,18 @@ const contractAbiClubhouse =
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_referrerAddr",
-				"type": "address"
-			}
-		],
-		"name": "getParticipentsByReferrer",
+		"inputs": [],
+		"name": "getMembers",
 		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			},
 			{
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
-			},
-			{
-				"internalType": "address[]",
-				"name": "",
-				"type": "address[]"
 			}
 		],
 		"stateMutability": "view",
@@ -127,7 +158,7 @@ const contractAbiClubhouse =
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "_participentAddr",
+				"name": "_member",
 				"type": "address"
 			}
 		],
@@ -145,57 +176,20 @@ const contractAbiClubhouse =
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "address",
 				"name": "",
-				"type": "uint256"
+				"type": "address"
 			}
 		],
-		"name": "participentAdds",
+		"name": "members",
 		"outputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "Referrer",
 				"type": "address"
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "participents",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "referrerAddr",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_participentAddr",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "_referrerAddr",
-				"type": "address"
-			}
-		],
-		"name": "setParticipent",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

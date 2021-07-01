@@ -524,9 +524,10 @@ contract NekoCollectibles is ERC721 {
         transferFrom(msg.sender, receiverAddrs, tokenId);
         
         Clubhouse Contract = Clubhouse(clubhouseContract);
-
+        
+        // if this Receiver not yet tie with a referrer , add this receiver 
         if (Contract.getReferrer(receiverAddrs) == address(0x0)) {
-            Contract.setParticipent(receiverAddrs,msg.sender);
+            Contract.addMember(receiverAddrs,msg.sender);
         }    
     }
     
@@ -548,7 +549,6 @@ contract NekoCollectibles is ERC721 {
     }
 
     function manekiPayout(address _contractAdds, address payable _payee, uint256 _amount) private{
-        
             manekiTokenAddress.approve(_contractAdds,_amount);
             manekiTokenAddress.allowance(_contractAdds,_payee);
             manekiTokenAddress.transferFrom(_contractAdds, _payee, _amount);

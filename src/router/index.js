@@ -31,7 +31,7 @@ const routes = [
       {path: '/mint', component:Mint },
       {path: '/analytics', component:Analytics },
       {path: '/contact', component:Contact },
-      {path: '/token/:id', component:Token }
+      {path: '/token/:id/:ref', component:Token }
     ]
   }
   
