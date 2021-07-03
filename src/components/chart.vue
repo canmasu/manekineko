@@ -4,8 +4,9 @@
     <radar-chart></radar-chart>
   </div>
 </template>
+
 <script>
-import RadarChart from '../charts/Radar'
+import RadarChart from '../charts/RadarChart'
 
 export default {
   components: {
@@ -13,3 +14,4 @@ export default {
   }
 }
 </script>
+
