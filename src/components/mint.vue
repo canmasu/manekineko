@@ -10,33 +10,44 @@
         <div> Neko Collectibles Token (NCT) : {{NFT.balance}}</div>
         <div> LIST of NCT : {{NFT.owned}}</div>
 
-        <ul>
-            <li v-for="(item,index) in payment.tokens" v-bind:key="index">
-                {{index}} -  {{item.tokenSymbol}} {{(item.tokenQuantity)/10**18}} {{item.tokenAddress}}
-            </li>
-        </ul>
+        <div> we accept </div>
 
+
+        <el-card>
+            <div>Members:</div>
+            <el-table :data="payment.tokens" stripe style="width: 100%">
+                    <el-table-column prop="tokenSymbol" label="Token" > </el-table-column>
+                    <el-table-column prop="tokenQtyDisplay" label="Price"> </el-table-column>  
+                    <el-table-column prop="" label="Wallet Balance" > </el-table-column>   
+            </el-table>
+
+        </el-card>
 
         <el-dialog title="Make a wish!" :visible.sync="dialogFormVisible">
 
-        <el-form :model="form">
-            <el-form-item label="Guardian" :label-width="formLabelWidth">
+        <el-form :model="form" :rules="wishRules" ref="wishForm">
+
+            <el-form-item label="Message" prop="wish" :label-width="formLabelWidth">
+                <el-input v-model="form.wish" placeholder="Write you wish here" ></el-input>
+            </el-form-item>
+            <el-form-item label="Guardian" prop="guardian" :label-width="formLabelWidth">
             <el-select v-model="form.guardian" placeholder="Select Guardian Neko">
                 <el-option v-for="item in NFT.owned" :key="'neko-'+item" :label="'招き猫 #'+item" :value="item"></el-option>
             </el-select>
             </el-form-item>
 
-            <el-form-item label="Payment" :label-width="formLabelWidth">
+            <el-form-item label="Payment" prop="payment" :label-width="formLabelWidth">
             <el-select v-model="form.payment" placeholder="Select token">
                 <el-option v-for="(item,index) in payment.tokens" :key="index" :label="index +' : $' +item.tokenSymbol+ '  '+ (item.tokenQuantity)/10**18" :value="index"></el-option>
             </el-select>
             </el-form-item>
 
+            <el-form-item class="dialog-footer">
+                <el-button type="text" @click="painting('wishForm')">Painting</el-button>
+                <el-button type="primary" @click="buyNFT('wishForm')">Confirm</el-button>
+            </el-form-item>
+
         </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">Cancel</el-button>
-            <el-button type="primary" @click="buyNFT()">Confirm</el-button>
-        </div>
         </el-dialog>
 
 
@@ -53,12 +64,12 @@
 
 
         <el-dialog title="Step 3" :visible.sync="dialogMint">
-        <el-form :model="form">
-            <span>Let's mint your NFT</span>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="payByERC20Token ( payment.tokens[form.payment].tokenAddress, '999000100010', form.guardian)">Confirm</el-button>
-        </div>
+            <el-form :model="form">
+                <span>Let's mint your NFT</span>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="payByERC20Token ( payment.tokens[form.payment].tokenAddress, '999000100010', form.guardian)">Confirm</el-button>
+            </div>
         </el-dialog>
 
 
@@ -88,37 +99,54 @@ export default {
   name: 'App',
   data() {
     return {
-      web3: null,
-      account: null,
-      accountNekoBalance:0,
-      poolBalance:0,
-      NFT : {
-        owned:0,
-        supply:0,
-        balance:0
-      },
-      contract :{
-        collectibles:null,
-        payment:null,
-        neko:null,
-        ERC20:null
-      },
-      payment : {
-        tokens :[],
-        count:0,
-        tokenAddress:null,
-        tokenSymbol:null,
-        tokenQuantity:null
-      },
-      dialogTableVisible: false,
-      dialogFormVisible: false,
-      dialogApprove : false,
-      dialogMint:false,
-      form: {
-        guardian: '',
-        payment: '',
-      },
-      formLabelWidth: '120px'
+        web3: null,
+        account: null,
+        accountNekoBalance:0,
+        poolBalance:0,
+        NFT : {
+            owned:0,
+            supply:0,
+            balance:0
+        },
+        contract :{
+            collectibles:null,
+            payment:null,
+            neko:null,
+            ERC20:null
+        },
+        payment : {
+            tokens :[],
+            count:0,
+            tokenAddress:null,
+            tokenSymbol:null,
+            tokenQuantity:null
+        },
+        dialogTableVisible: false,
+        dialogFormVisible: false,
+        dialogApprove : false,
+        dialogMint:false,
+        form: {
+            guardian: '',
+            payment: '',
+            wish: '',
+        },
+        NFTProfile : {
+            DNA : '656802658766910455977169472647060000049990001000101614884078',
+            nftID : '5'
+        },
+        wishRules: {
+                wish: [
+                    { required: true, message: 'Please make a wish', trigger: 'blur' },
+                    { min: 5, max: 60, message: 'Message within 5 to 60 charaters', trigger: 'blur' }
+                ],
+                guardian: [
+                    { required: true, message: 'required a guardian', trigger: 'change' }
+                ],
+                payment: [
+                    { required: true, message: 'select a payment token', trigger: 'change' }
+                ]
+        },      
+        formLabelWidth: '120px'
     };
   },
   mounted() {
@@ -167,24 +195,63 @@ export default {
         });
                 
     },
-    buyNFT (){
-        let index = this.form.payment;
-        let refID = this.form.guardian;
+    async generateNFT(){
+        const {data:res} = await this.$http.post('/painter/', this.form);
+        console.log('api data : ', res);
+    },
+    painting (form) {
 
-        if(index==0){
-            this.payByCoins('999000100010',refID);
-        } else {
+        this.$refs[form].validate( async (valid) => {
+        if (valid) {
+
             
-            this.payment.tokenQuantity = this.payment.tokens[index].tokenQuantity;
-            this.payment.tokenAddress  = this.payment.tokens[index].tokenAddress;
-            this.payment.tokenSymbol   = this.payment.tokens[index].tokenSymbol;
+            console.log ('post :', this.form);
+            const {data:res} = await this.$http.post('/painter/', this.form);
+            
+            if (res.Code==200){
+                console.log('success');
+            } else {
+                console.log('failed!');
+            }
+            console.log('api data : ', res);
+
+        } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+    },
+    buyNFT (wishForm){
+
+        this.$refs[wishForm].validate((valid) => {
+          if (valid) {
+
+            // select payment token  
+            let index = this.form.payment;
+            let refID = this.form.guardian;
+
+            if(index==0){
+                // Pay by native coin
+                this.payByCoins('999000100010',refID);
+            } else {
+                // Pay by Other ERC20 Token
+                this.payment.tokenQuantity = this.payment.tokens[index].tokenQuantity;
+                this.payment.tokenAddress  = this.payment.tokens[index].tokenAddress;
+                this.payment.tokenSymbol   = this.payment.tokens[index].tokenSymbol;
+                this.contract.ERC20 = new this.web3.eth.Contract(abi_neko, this.payment.tokenAddress);
+                this.dialogFormVisible = false;
+                this.dialogApprove = true;
+            }
+
+            alert('submit!');
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
 
 
-            this.contract.ERC20 = new this.web3.eth.Contract(abi_neko, this.payment.tokenAddress);
-
-            this.dialogFormVisible = false;
-            this.dialogApprove = true;
-        }
+        
     },
     payByCoins (_machine,_refNekoId){
         // pay with Coin 
@@ -194,6 +261,7 @@ export default {
         }).then((res) => {
             this.dialogFormVisible = false;
             console.log('pay with coin',res);
+            
         })
     },
     async approvePayment (_amount){
@@ -282,8 +350,11 @@ export default {
                 tokenSymbol: 'BNB',
                 //tokenQuantity: (1*10**17).toString(),
                 tokenQuantity : 100000000,
+                tokenQtyDisplay : parseFloat(100000000/10**18).toFixed(10),
                 tokenStatus: true
             });
+
+            
                 
         for(let i=0; i< this.payment.count ;i++){ 
             
@@ -293,6 +364,7 @@ export default {
                         tokenAddress: res[0],
                         tokenSymbol: res[1],
                         tokenQuantity: res[2],
+                        tokenQtyDisplay : Number(res[2]/10**18).toLocaleString(),
                         tokenStatus: res[3],
                     });
                 }
@@ -310,3 +382,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.dialog-footer {
+    text-align: right;
+}
+</style>

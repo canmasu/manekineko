@@ -9,7 +9,7 @@ import axios from 'axios'
 
 
 Vue.prototype.$http=axios
-axios.defaults.baseURL="http://localhost:8080/api"
+axios.defaults.baseURL="https://api.neko.exchange"
 
 Vue.config.productionTip = false
 Vue.use(ElementUI);
