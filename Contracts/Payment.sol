@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// BSC 0.V3.01
+// BSC 0.V4.01
 
 pragma solidity ^0.8.3;
 
@@ -126,7 +126,7 @@ contract PaymentGateway {
 
 
     event ROLES (address user, uint256 role, bool status);
-    event PAYMENT (address indexed payee, IERC20 indexed token, uint256 amount);
+    event PAYMENT (address indexed payee, uint256 _nftID, IERC20 indexed token, uint256 amount);
     event ADDPAYMENTTOKEN (IERC20 indexed _tokenAddress, string indexed _tokenSymbol, uint256 _tokenQuantity);
     event UPDATETOKENRATE (IERC20 indexed _tokenAddress, uint256 _tokenAmount);
     
@@ -205,6 +205,7 @@ contract PaymentGateway {
     
     function paymentByToken (IERC20 _tokenAddress, uint256 _machine, uint256 _refNekoId) public {
         address from = msg.sender;
+        uint256 newNekoId;
         
         NekoCollectibles Contract = NekoCollectibles(collectiblesContract);
         
@@ -212,8 +213,8 @@ contract PaymentGateway {
         for(uint i=0;i<ERC20Tokens.length;i++){
             if(ERC20Tokens[i].tokenAddress == _tokenAddress){
                 _tokenAddress.transferFrom(from, address(this), ERC20Tokens[i].tokenQuantity);
-                Contract.mintCollectible(from, _machine, _refNekoId);
-                emit PAYMENT(from, _tokenAddress, ERC20Tokens[i].tokenQuantity);
+                newNekoId = Contract.mintCollectible(from, _machine, _refNekoId);
+                emit PAYMENT(from, newNekoId, _tokenAddress, ERC20Tokens[i].tokenQuantity);
             }
         }
     }
@@ -221,8 +222,11 @@ contract PaymentGateway {
     function paymentByCoin (uint256 _machine, uint256 _refNekoId) external payable {
         require(msg.value ==  coinQuantity);
         address from = msg.sender;
+        uint256 newNekoId;
         NekoCollectibles Contract = NekoCollectibles(collectiblesContract);
-        Contract.mintCollectible(from, _machine, _refNekoId);
+        newNekoId = Contract.mintCollectible(from, _machine, _refNekoId);
+        
+        emit PAYMENT(from, newNekoId, IERC20(0x0000000000000000000000000000000000000001), coinQuantity);
     }
     
     

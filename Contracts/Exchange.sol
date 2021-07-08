@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// BSC 0.V3.01
+// BSC 0.V4.01
 // Trading Currency True. ETH AND False. NEKO
 // Zero Transaction Fee with $NEKO
 // Transaction Fee for ETh deal, with the retrun of $NEKO

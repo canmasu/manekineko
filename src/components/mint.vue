@@ -43,7 +43,7 @@
             </el-form-item>
 
             <el-form-item class="dialog-footer">
-                <el-button type="text" @click="painting('wishForm')">Painting</el-button>
+                <el-button type="text" @click="generateNewNFT('2')">Painting</el-button>
                 <el-button type="primary" @click="buyNFT('wishForm')">Confirm</el-button>
             </el-form-item>
 
@@ -68,7 +68,7 @@
                 <span>Let's mint your NFT</span>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="payByERC20Token ( payment.tokens[form.payment].tokenAddress, '999000100010', form.guardian)">Confirm</el-button>
+                <el-button type="primary" @click="payByERC20Token ( payment.tokens[form.payment].tokenAddress, form.guardian)">Confirm</el-button>
             </div>
         </el-dialog>
 
@@ -83,12 +83,12 @@
 import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
+const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
 
 
 // Contract : Collectibles Paymnet
 import abi_payment from '../web3/abi_payment';
-const contract_payment = '0x1a547E41d23de5cC3E0Ef53c5e61D951A6566fB4';
+const contract_payment = '0xAFD04827187a6B1488F57cf10f1608ABd019C4Ea';
 
 
 // Contract : ERC20 - $NEKO
@@ -130,9 +130,13 @@ export default {
             payment: '',
             wish: '',
         },
-        NFTProfile : {
-            DNA : '656802658766910455977169472647060000049990001000101614884078',
-            nftID : '5'
+        newNFT : {
+            id      : '',
+            DNA     : '',
+            gammaID : '',
+            power   : '',
+            refCount: '',
+            wish    : ''
         },
         wishRules: {
                 wish: [
@@ -195,12 +199,9 @@ export default {
         });
                 
     },
-    async generateNFT(){
-        const {data:res} = await this.$http.post('/painter/', this.form);
-        console.log('api data : ', res);
-    },
+/** 
     painting (form) {
-
+``
         this.$refs[form].validate( async (valid) => {
         if (valid) {
 
@@ -221,6 +222,30 @@ export default {
           }
         });
     },
+*/
+
+    generateMachineInput (){
+
+        // 3D = 999  ORIGIN
+        // 4D = 0001 PAINTER : Source Code that use to generate art work 0001
+        // 4D = 0001 SERIES  : New Designs added by batch 0001
+        // 11D = BIRTHDAY 01610117854
+
+        var machineInput1 = "999000100010";
+        var machineInput2 = "99900010001";
+        var machineInput = null;
+
+        var localtime = Math.round((new Date()).getTime() / 1000);
+        var tokyo_offset = 540*60;
+        var tokyoTime = (localtime + tokyo_offset);
+
+        if (tokyoTime<10000000000){
+        machineInput = machineInput1.concat(tokyoTime);
+        } else {
+        machineInput = machineInput2.concat(tokyoTime);
+        }
+        return machineInput;
+    },
     buyNFT (wishForm){
 
         this.$refs[wishForm].validate((valid) => {
@@ -232,7 +257,7 @@ export default {
 
             if(index==0){
                 // Pay by native coin
-                this.payByCoins('999000100010',refID);
+                this.payByCoins( this.generateMachineInput(), refID );
             } else {
                 // Pay by Other ERC20 Token
                 this.payment.tokenQuantity = this.payment.tokens[index].tokenQuantity;
@@ -242,8 +267,6 @@ export default {
                 this.dialogFormVisible = false;
                 this.dialogApprove = true;
             }
-
-            alert('submit!');
           } else {
             console.log('error submit!!');
             return false;
@@ -253,6 +276,28 @@ export default {
 
         
     },
+    async generateNewNFT(_id){
+
+        await this.contract.collectibles.methods.Nekos(_id).call({
+        from: this.account
+        }).then((res) => {
+            this.newNFT.id      = _id;
+            this.newNFT.DNA     = res.DNA;
+            this.newNFT.gammaID = res.gammaNekoID;
+            this.newNFT.power   = res.power; 
+            this.newNFT.refCount= res.refCount;
+            this.newNFT.wish    = this.form.wish;
+
+            console.log('gen new NFT',this.newNFT);
+            this.generateFile ();
+            
+        })
+    },
+    async generateFile (){
+            // generate Metadata and GIF
+            const {data:res2} = await this.$http.post('/painter/', this.newNFT);
+            console.log('api data : ', res2);
+    },
     payByCoins (_machine,_refNekoId){
         // pay with Coin 
         this.contract.payment.methods.paymentByCoin(_machine,_refNekoId).send({
@@ -260,7 +305,9 @@ export default {
         value: this.payment.tokens[0].tokenQuantity
         }).then((res) => {
             this.dialogFormVisible = false;
+            this.generateNewNFT(res.events.PAYMENT.returnValues._nftID);
             console.log('pay with coin',res);
+            console.log('New NFT ID : ',res.events.PAYMENT.returnValues._nftID);
             
         })
     },
@@ -276,13 +323,17 @@ export default {
             //this.allowancePayment ();
         })
     },
-    async payByERC20Token ( _tokenAddress, _machine, _refNekoId){
+    async payByERC20Token ( _tokenAddress, _refNekoId){
         // pay with other ERC20 tokens
+        let _machine = this.generateMachineInput();
+
         await this.contract.payment.methods.paymentByToken(_tokenAddress,_machine,_refNekoId).send({
         from: this.account,
         }).then((res) => {
             this.dialogMint = false;
-            console.log('pay with token ',res);
+            this.generateNewNFT(res.events.PAYMENT.returnValues._nftID);
+            console.log('pay with ERC20 Token',res);
+            console.log('New NFT ID : ',res.events.PAYMENT.returnValues._nftID);
         })
     },
 

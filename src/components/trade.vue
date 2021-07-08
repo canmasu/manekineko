@@ -92,7 +92,7 @@ import getWeb3 from '../web3/web3';
 
 // Contract : Exchange
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0xe2091F5439e031033a358C0E8Fa90c5dD6ad85a3';
+const contract_exchange = '0x3Cd4B1b772629dCe341D8f1Db0B94aEba9964236';
 
 // Contract : ERC20 - $NEKO
 import abi_neko from '../web3/abi_neko';
@@ -240,7 +240,7 @@ getTotalDeals(){
                   Price: res[3],
                   Currency : _currency,
                   Status : _status,
-                  url: 'https://harvestcamasu.com/cryptoArtist/neko/' + res[2] + '.svg',
+                  url: 'https://nft.neko.exchange/' + res[2] + '.svg',
               });
             }
         

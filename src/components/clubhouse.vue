@@ -17,10 +17,10 @@
 import getWeb3 from '../web3/web3';
 
 import abi_clubhouse from '../web3/abi_clubhouse';
-const contract_clubhouse = '0x0BE6Cc56028bFE2459dD573e8ffE1419157d214C';
+const contract_clubhouse = '0x9Da0Db278C51d425E3d31Fe92DAAE3B91D016FB9';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
+const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
 
 export default {
     data(){

@@ -562,7 +562,13 @@ const NekoCollectibleABI =
 			}
 		],
 		"name": "mintCollectible",
-		"outputs": [],
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},

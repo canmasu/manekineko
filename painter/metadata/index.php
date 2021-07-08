@@ -7,7 +7,8 @@ header("Access-Control-Allow-Credentials: true");
 header('Content-Type: application/json');
   
 // include JSON file to memory
-$json = file_get_contents('../src/metadata/'.$_GET['token'].'.json');
+//$json = file_get_contents('storage/'.$_GET['token'].'.json');
+$json = file_get_contents('storage/'.$_GET['token'].'.json');
   
 if($json!=null){    
 
@@ -23,6 +24,6 @@ else{
     http_response_code(404);
   
     // tell the user product does not exist
-    echo json_encode(array("message" => "Product does not exist."));
+    echo json_encode(array("message" => "NFT does not exist."));
 }
 ?>

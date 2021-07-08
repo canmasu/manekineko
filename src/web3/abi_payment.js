@@ -51,6 +51,12 @@ const CollectiblePaymentABI =
 				"type": "address"
 			},
 			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "_nftID",
+				"type": "uint256"
+			},
+			{
 				"indexed": true,
 				"internalType": "contract IERC20",
 				"name": "token",
@@ -503,5 +509,4 @@ const CollectiblePaymentABI =
 		"type": "function"
 	}
 ]
-
 export default CollectiblePaymentABI;

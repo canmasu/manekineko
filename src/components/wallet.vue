@@ -15,9 +15,19 @@
     <el-table  :data="NFTs.filter(data => !search || data.id.toLowerCase().includes(search.toLowerCase()))" stripe style="width: 100%">
         <el-table-column prop="url" label="url">
             <template slot-scope="scope">
-                <img :src="scope.row.url"/>
+                <el-image :src="scope.row.url" class="nft-image">
+                    <div slot="placeholder" class="image-slot">
+                        Loading...<span class="dot">...</span>
+                    </div>
+                    <div slot="error" class="image-slot">
+                        <i class="el-icon-picture-outline"></i>
+                    </div>
+                </el-image>
             </template>
         </el-table-column>
+
+ 
+
         <el-table-column prop="id" label="招き猫 #"> </el-table-column>
         <el-table-column prop="gen" label="Generation"> </el-table-column>
         <el-table-column prop="DNA" label="DNA"> </el-table-column>
@@ -104,10 +114,10 @@
 import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
+const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
 
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0xe2091F5439e031033a358C0E8Fa90c5dD6ad85a3';
+const contract_exchange = '0x3Cd4B1b772629dCe341D8f1Db0B94aEba9964236';
 
 
 export default {
@@ -212,7 +222,7 @@ export default {
                         id: Neko[0],
                         power: Neko[1],
                         DNA: Neko[2],
-                        url: 'https://harvestcamasu.com/cryptoArtist/neko/' + Neko[0] + '.svg',
+                        url: 'https://nft.neko.exchange/' + Neko[0] + '.svg',
                         gen : gen_Display,
                     });
 

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
-// BSC 0.V3.01
-// input number lucky NFT
-// Changed the Maneki Pool relatively to the Royalty distribution
+// BSC 0.V4 . deployed . 
+// changed the gamma 22**10 to 28**10
 
 pragma solidity ^0.8.0;
 
@@ -279,7 +278,7 @@ contract NekoCollectibles is ERC721 {
      *
      */
      
-    function mintCollectible (address _buyer, uint256 _machine, uint256 _refNekoId) external onlyCLevel(){
+    function mintCollectible (address _buyer, uint256 _machine, uint256 _refNekoId) external onlyCLevel() returns (uint256){
         
         if( ICO == false ) {
             require (_buyer == ownerOf(_refNekoId));
@@ -290,12 +289,13 @@ contract NekoCollectibles is ERC721 {
         uint256 generation;
         uint256 _newGammaNekoID;
         uint256 refPower;
+        uint256 newNekoId;
 
         Neko storage NEKO = Nekos[_refNekoId];
 
 
         if (_refNekoId>0 && NEKO.refCount<5){
-            generation = NEKO.DNA.div(10**22).mod(1000000);
+            generation = NEKO.DNA.div(10**28).mod(1000000);
 
             if(generation==3 && generation >=3){
                 _newGammaNekoID = _refNekoId;
@@ -318,7 +318,7 @@ contract NekoCollectibles is ERC721 {
         (manekiPower,DNA)  = nekoDNA(_machine, generation, refPower);
         
         // Mint Neko 
-        createNeko(_buyer, manekiPower, DNA, 0, _newGammaNekoID);
+        newNekoId = createNeko(_buyer, manekiPower, DNA, 0, _newGammaNekoID);
         
         // Maneki Cycle 
         // Halve Maneki Pool for each 100,000 NFT minted
@@ -349,11 +349,12 @@ contract NekoCollectibles is ERC721 {
         manekiPayout (address(this), payable(developerAddr), developerAmount);
         emit ARTIST (artistAddr,artistAmount, block.timestamp);
         emit DEVELOPER (developerAddr,developerAmount, block.timestamp);
+        return newNekoId;
     }
 
 
 
-    function createNeko(address _owner, uint256 _power, uint256 _DNA, uint256 _refCount, uint256 _gammaNekoID) private{
+    function createNeko(address _owner, uint256 _power, uint256 _DNA, uint256 _refCount, uint256 _gammaNekoID) private returns (uint){
 
         require(_owner != address(0));
 
@@ -369,7 +370,7 @@ contract NekoCollectibles is ERC721 {
         super._mint(_owner, newNekoId);
 
         emit BIRTH (_owner,newNekoId, newNeko.power, newNeko.DNA);
-        //return newNekoId;
+        return newNekoId;
     }
 
     function nekoDNA(uint256 _machine, uint256 _generation, uint256 _refPower) private view returns ( uint256, uint256){
@@ -397,11 +398,10 @@ contract NekoCollectibles is ERC721 {
         *  4D = PAINTER : Source Code that use to generate art work
         *  4D = SERIES  : New Designs added by batch
         *  11D = BIRTHDAY
-        *  T = 22D
-        *  --> 39P  > 50P
+        *  --> 39P  > 60P
         *  
         *  6D = BASE MANEKIPOWER
-        *  --> 51P  > 56P
+        *  --> 61P  > 66P
         */
 
        uint256 energies = uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty.add(_machine)))).mod(10**26);

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// BSC 0.V3.01
+// BSC 0.V4.01
 // input number lucky NFT
 // Changed the Maneki Pool relatively to the Royalty distribution
 
