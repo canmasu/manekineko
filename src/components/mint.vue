@@ -27,6 +27,10 @@
 
         <el-form :model="form" :rules="wishRules" ref="wishForm">
 
+            <el-form-item label="Name" prop="name" :label-width="formLabelWidth">
+                <el-input v-model="form.name" placeholder="Give your neko a name" ></el-input>
+            </el-form-item>
+
             <el-form-item label="Message" prop="wish" :label-width="formLabelWidth">
                 <el-input v-model="form.wish" placeholder="Write you wish here" ></el-input>
             </el-form-item>
@@ -126,6 +130,7 @@ export default {
         dialogApprove : false,
         dialogMint:false,
         form: {
+            name: '',
             guardian: '',
             payment: '',
             wish: '',

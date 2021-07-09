@@ -9,6 +9,8 @@
             <el-table-column prop="amount" label="$NEKO" width="200"> </el-table-column>
             <el-table-column prop="timestamp" label="Time" width="80"> </el-table-column>
             <el-table-column prop="walletAddress" label="walletAddress"> </el-table-column>
+            <el-table-column prop="elapsed" label="elapsed"> </el-table-column>
+            
         </el-table>
 
 
@@ -22,7 +24,7 @@
 
 import getWeb3 from '../web3/web3';
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8Ae1a085AA58bB96D1395e2c64C89483F6ac1F45';
+const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
 
 
 export default ({
@@ -30,10 +32,12 @@ export default ({
         return {
             account:null,
             LuckyCoinsByWallet :[],
+            amountByDay :[],
             totalLuckyCoinsByWallet:0,
             contract :{
                 collectibles:null
-            }
+            },
+            data:[]
         }
     },
     mounted () {
@@ -76,6 +80,7 @@ export default ({
             }).then((events) => {
 
             
+
             for( let i =0 ; i < events.length ; i++){
 
                 var current = Math.round((new Date()).getTime() / 1000);
@@ -86,6 +91,7 @@ export default ({
                 var msPerYear = msPerDay * 365;
                 var elapsed = current - events[i].returnValues.timestamp;
                 var engDate ='';
+              
 
                 if (elapsed < msPerMinute) { engDate = Math.round(elapsed/1000) + ' s'; }
                 else if (elapsed < msPerHour) { engDate = Math.round(elapsed/msPerMinute) + ' s'; }
@@ -94,16 +100,31 @@ export default ({
                 else if (elapsed < msPerYear) { engDate = Math.round(elapsed/msPerMonth) + ' M'; }
                 else { engDate = '>M';}
 
+
+
+                //this.data[parseInt(elapsed/86499)] += parseInt(events[i].returnValues.amount/10**18);
+                
+
+                this.data[parseInt(elapsed/86499)] += 1;
+                //this.amountByDay[0] = this.data;
+
+
+
                 this.LuckyCoinsByWallet.push({
-                nekoId    : events[i].returnValues.luckyNeko,
-                amount    : events[i].returnValues.amount/1000000000000000000,
-                timestamp : engDate,
-                walletAddress : events[i].returnValues.luckyWallet,
+                nekoId          : events[i].returnValues.luckyNeko,
+                amount          : events[i].returnValues.amount/10**18,
+                timestamp       : engDate,
+                walletAddress   : events[i].returnValues.luckyWallet,
+                elapsed         : parseInt(elapsed/86499)
                 });
                 //total coins invited
-                this.totalLuckyCoinsByWallet += events[i].returnValues.amount/1000000000000000000;
-
+                this.totalLuckyCoinsByWallet += events[i].returnValues.amount/10**18;
+                
+  
             }
+
+            console.log ('amont by day :', this.data);
+
             }).catch((err) => {
                 console.log(err, 'err');
             });
