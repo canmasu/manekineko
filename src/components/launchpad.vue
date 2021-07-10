@@ -15,10 +15,6 @@
     data () {
       return {
         datacollection: null,
-        
-        options: {
-            tension: 0,
-        }
       }
     },
     mounted () {

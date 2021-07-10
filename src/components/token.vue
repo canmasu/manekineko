@@ -20,8 +20,7 @@
             </div>
         </el-image>
 
-
-
+        <radar-chart :chart-data="chartData" :options="options"></radar-chart>
 
         <el-table  :data="NFT.attributes" stripe style="width: 50%">
             <el-table-column prop="trait_type" label="trait_type" width="250"> </el-table-column>
@@ -34,6 +33,8 @@
 </template>
 
 <script>
+import RadarChart from '../charts/RadarChart';
+
 
 import getWeb3 from '../web3/web3';
 
@@ -42,6 +43,9 @@ const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
 
 
 export default {
+    components: {
+        RadarChart
+    },
     data(){
         return{
             contractInstance:null,
@@ -69,7 +73,27 @@ export default {
                     value:null,
                     display_type:null
                 }]
-            }
+            },
+            energies : {
+                wealth      : 0,
+                opportunity : 0,
+                relationship: 0,
+                wisdom      : 0,
+                health      : 0
+            },
+            // Radarchart Setting and data
+            chartData : null,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scale: {
+                    ticks: {
+                    min: 0,
+                    max: 100,
+                    stepSize: 25
+                    }
+                }
+            },
         }
     },
     mounted() {
@@ -100,9 +124,32 @@ export default {
 
     },
     methods :{
-        getMetadata(id){
+        fillData (a,b,c,d,e) {
+
+            console.log('pre-filling :');
+
+            this.chartData = {
+                labels: [ "Wealth",	"Opportunity","Relationship", "Wisdom",	"Health"],
+                datasets: [
+                {
+                    label: 'Maneki Power',
+                    borderWidth: 0.5,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 99, 132,0.5)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 99, 132)',
+                    data: [a, b, c, d, e]
+                },
+                ]
+            }
+            console.log('filling oppotunity:',b);
+        },
+        async getMetadata(id){
             const axios = require('axios');
-            axios.get('https://metadata.neko.exchange/token/'+id)
+            await axios.get('https://metadata.neko.exchange/token/'+id)
             .then((res) => {
                 console.log ('metadata :',res.data);
                 //import data form metadata
@@ -113,6 +160,17 @@ export default {
                 this.NFT.image = res.data.image;
                 this.NFT.wish = res.data.wish;
                 this.NFT.attributes = res.data.attributes;
+
+                this.fillData(
+                    parseInt(res.data.attributes[5].value),
+                    parseInt(res.data.attributes[6].value),
+                    parseInt(res.data.attributes[7].value),
+                    parseInt(res.data.attributes[8].value),
+                    parseInt(res.data.attributes[9].value)
+                    );
+
+                console.log('chartData wealth: ', res.data.attributes[6].value);
+
             }).catch((err) => {
                 console.log(err, 'err');
             });    
