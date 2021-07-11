@@ -15,8 +15,8 @@ import "./Clubhouse.sol";
 
 contract Exchange {
 
-    constructor (IERC721 _NFTAddress, IERC20 _NekoAddress, address _clubhouseContract) public {
-        NFTAddress           = _NFTAddress;
+    constructor (IERC721 _CollectiblesAddress, IERC20 _NekoAddress, address _clubhouseContract) public {
+        NFTAddress           = _CollectiblesAddress;
         NEKOAddress          = _NekoAddress;
         clubhouseContract    = _clubhouseContract;
     }

@@ -23,9 +23,13 @@ $_POST = json_decode(file_get_contents("php://input"),true);
 
 // required 3 input. DNA , Wish and NFT_Id
 $nftID    = $_POST['id'];
-$energies = $_POST['DNA'];
 $wish     = $_POST['wish'];
+$name     = $_POST['name'];
+$guardian = $_POST['guardian'];
+$energies = $_POST['DNA'];
 $gammaID  = $_POST['gammaID'];
+$power    = $_POST['power'];
+
 
      /**
         *  1D = ESCAPE
@@ -420,12 +424,14 @@ Array (
             "value" => $NFT ->Birthday,
         )
     ),
-    "description" => "Great in bringing you luck especially in wealth, relationship and wisdom",
+    "description" => $wish,
     "external_url" => "https://nft.neko.exchange/",
     "image" => 'https://nft.neko.exchange/'.$nftID.'.svg',
-    "name" => '招き猫 #'.$nftID,
+    "name" => $name,
+    "id" => '招き猫 #'.$nftID,
     "art_dna" => $energies,
-    "wish" => $wish,
+    "guardian" => $guardian,
+    "gamma" => $gammaID
 );
 
 

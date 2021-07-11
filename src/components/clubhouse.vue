@@ -9,6 +9,12 @@
             </el-table>
 
         </el-card>
+
+            <div slot="footer" class="dialog-footer">
+                <el-button > Send a gift</el-button>
+                <el-button type="primary" > Share a deal </el-button>
+            </div>
+
     </div>
 </template>
 

@@ -5,11 +5,12 @@
         <div>Neko collectibles Token : {{ $route.params.id }}</div>
         </router-link>
 
-        <div> {{NFT.name}}</div>
-        <div> {{NFT.description}}</div>
-        <div> {{NFT.external_url}} </div>
-        <div> {{NFT.art_dna}} </div>
-        <div> {{NFT.wish}} </div>
+        <div> Neko's name :{{NFT.name}}</div>
+        <div> Wish :{{NFT.description}}</div>
+        <div> URL : {{NFT.external_url}} </div>
+        <div> DNA : {{NFT.art_dna}} </div>
+        <div> Guardian : {{NFT.guardian}} </div>
+        <div> Gamma : {{NFT.gamma}} </div>
 
         <el-image :src="NFT.image" class="nft-image">
             <div slot="placeholder" class="image-slot">
@@ -154,6 +155,9 @@ export default {
                 console.log ('metadata :',res.data);
                 //import data form metadata
                 this.NFT.name = res.data.name;
+                this.NFT.id = res.data.id;
+                this.NFT.guardian = res.data.guardian;
+                this.NFT.gamma = res.data.gamma;
                 this.NFT.description = res.data.description;
                 this.NFT.external_url = res.data.external_url;
                 this.NFT.art_dna = res.data.art_dna;
@@ -185,7 +189,7 @@ export default {
             }).then((res) => {
                 this.newNFT.id      = _id;
                 this.newNFT.DNA     = res.DNA;
-                this.newNFT.gammaID = res.gammaNekoID;
+                this.newNFT.gamma   = res.gammaNekoID;
                 this.newNFT.power   = res.power; 
                 this.newNFT.refCount= res.refCount;
                 this.newNFT.wish    = '';

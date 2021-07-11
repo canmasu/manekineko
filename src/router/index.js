@@ -12,6 +12,9 @@ import Contact from '../components/contact.vue'
 import Token from '../components/token.vue'
 import Mint from '../components/mint.vue'
 import Clubhouse from '../components/clubhouse.vue'
+import OpenDeal from '../components/opendeal.vue'
+import ApprovedDeal from '../components/approveddeal.vue'
+import TradeHistory from '../components/tradehistory.vue'
 
 
 Vue.use(VueRouter)
@@ -25,6 +28,9 @@ const routes = [
       {path: '/welcome', component:Welcome },
       {path: '/wallet', component:Wallet },
       {path: '/trade', component:Trade },
+      {path: '/opendeal', component:OpenDeal },
+      {path: '/approveddeal', component:ApprovedDeal },
+      {path: '/tradehistory', component:TradeHistory },
       {path: '/launchpad', component:Launchpad },
       {path: '/manekineko', component:Manekineko },
       {path: '/clubhouse', component:Clubhouse },

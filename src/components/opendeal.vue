@@ -240,16 +240,19 @@ getTotalDeals(){
             }
             if (res[5]==true){
               _status = 'active';
-              this.deals.push({
-                  DealID: i,
-                  Seller: res[0],
-                  Buyer: res[1],
-                  TokenID: res[2],
-                  Price: res[3],
-                  Currency : _currency,
-                  Status : _status,
-                  url: 'https://nft.neko.exchange/' + res[2] + '.svg',
-              });
+
+                if(res[0]==this.account){
+                    this.deals.push({
+                        DealID: i,
+                        Seller: res[0],
+                        Buyer: res[1],
+                        TokenID: res[2],
+                        Price: res[3],
+                        Currency : _currency,
+                        Status : _status,
+                        url: 'https://nft.neko.exchange/' + res[2] + '.svg',
+                    });
+                }
             }
         
           }).catch((err) => {

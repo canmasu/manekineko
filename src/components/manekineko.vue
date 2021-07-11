@@ -3,6 +3,7 @@
         <el-card>
         <h1> Maneki $Neko </h1>
         <h2> Invited Lucky Token </h2>
+        <div> Total Maneki $Neko  <br><br><br></div>
         <div> TOTAL Invited token : $NEKO {{totalLuckyCoinsByWallet}} </div>
 
 

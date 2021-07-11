@@ -1,14 +1,18 @@
 <template>
     <div>
+
+      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" >
+        <el-menu-item index="1">Gift received</el-menu-item>
+        <el-menu-item index="3">Gift sent</el-menu-item>
+      </el-menu>
+
     <el-card>
-        <div> Pass in input: address(wallet) => below details, mainly is TESTIMONAL purpose </div>
-        <div> Summary </div>
-        <div> BNB Balance , Neko Balance, other accepted coin balance </div>
-        <div> Total Maneki $Neko  <br><br><br></div>
-        <div> records </div>
-        <div> NFT Transcations (the trading record) </div>
-        <div> Maneki $Neko (Coins invited record</div>
         <div> My Walllet address : {{account}}</div>
+        <div> BALANCE </div>
+        <div> BNB  : {{parseFloat(balance.BNB/10**18).toFixed(2)}}</div>
+        <div> NEKO : {{(balance.NEKO/10**18).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}}</div>
+        <div> CAKE : {{(balance.CAKE/10**18).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}}</div>
+        <div> BAKE : {{(balance.BAKE/10**18).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}}</div>
 
 
 
@@ -119,14 +123,22 @@ const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
 import abi_exchange from '../web3/abi_exchange';
 const contract_exchange = '0x3Cd4B1b772629dCe341D8f1Db0B94aEba9964236';
 
+// Contract : ERC20 - $NEKO
+import abi_neko from '../web3/abi_neko';
+const contract_neko = '0xdF3CF86Faed8a1936F3dB48a374E981e3fFC3164';
+// Contract : ERC20 - $CAKE
+const contract_cake = '0xf7D0A2f1B4e8A1c44eF67019C3d0D8F89107fEA1';
+// Contract : ERC20 - $BAKE
+const contract_bake = '0x595724E0851ac2325dc509c17D0cF80A940581f2';
+
 
 export default {
     data(){
         return{
+            activeIndex: '1',
             contractInstance:null,
             account:null,
             isCollapse:false,
-            balance:0,
             tokenSupply:0,
             name:null,
 
@@ -160,7 +172,13 @@ export default {
                 tokenID: '',
                 receiverAddr:''
             },
-            formLabelWidth: '120px'
+            formLabelWidth: '120px',
+            balance : {
+                BNB :0,
+                NEKO : 0,
+                CAKE : 0,
+                BAKE : 0
+            }
 
         }
     },
@@ -172,20 +190,41 @@ export default {
             getWeb3().then((res) => {
                 this.web3 = res;
 
-                //connect Contracts Collectibles, 
+                //connect Collectibles Contract 
                 this.contract.collectibles = new this.web3.eth.Contract(abi_collectible, contract_collectible);
-                //connect Contracts Exchange
+                //connect Exchange Contract
                 this.contract.exchange = new this.web3.eth.Contract(abi_exchange, contract_exchange);
+                //connect Neko Contract
+                this.contract.neko = new this.web3.eth.Contract(abi_neko, contract_neko);
+                this.contract.cake = new this.web3.eth.Contract(abi_neko, contract_cake);
+                this.contract.bake = new this.web3.eth.Contract(abi_neko, contract_bake);
                 
                 //get current signed wallet address
                 this.web3.eth.getAccounts().then((accounts) => {
-                    [this.account] = accounts;
+                    this.account = accounts[0];
+                    this.getNFTOwned();
+                    this.getNekoBalance();
+                    this.getCakeBalance();
+                    this.getBakeBalance();
 
-                this.getNFTOwned();
+                    //get BNB balance
+                    this.web3.eth.getBalance(this.account).then((res) => {
+                        
+                        console.log('BNB bal :', res);
+                        this.balance.BNB = res;
+
+                    }).catch((err) => {
+                        console.log(err, 'err!!');
+                    });
+
+
 
                 }).catch((err) => {
                     console.log(err, 'err!!');
                 });
+           
+
+
             });
             } else {
                 //alert('Wallet not connected! Kindly use Coinbase Wallet or Google Chrome with Metamask Plugin');
@@ -193,6 +232,27 @@ export default {
             }
     },
     methods :{
+        getNekoBalance (){
+            this.contract.neko.methods.balanceOf(this.account).call({
+            }).then((res) => {
+                this.balance.NEKO = res;
+                console.log('NEKO bal: ', res);
+            })
+        },
+        getCakeBalance (){
+            this.contract.cake.methods.balanceOf(this.account).call({
+            }).then((res) => {
+                this.balance.CAKE = res;
+                console.log('CAKE bal: ', res);
+            })
+        },
+        getBakeBalance (){
+            this.contract.bake.methods.balanceOf(this.account).call({
+            }).then((res) => {
+                this.balance.BAKE = res;
+                console.log('BAKE bal: ', res);
+            })
+        },
         getNFTOwned (){        
 
             // retrive owned NFTs

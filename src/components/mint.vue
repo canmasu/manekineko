@@ -136,12 +136,14 @@ export default {
             wish: '',
         },
         newNFT : {
-            id      : '',
-            DNA     : '',
-            gammaID : '',
-            power   : '',
+            id: '',
+            wish: '',
+            name: '',
+            guardian : '',
+            DNA: '',
+            gammaID: '',
+            power: '',
             refCount: '',
-            wish    : ''
         },
         wishRules: {
                 wish: [
@@ -287,11 +289,13 @@ export default {
         from: this.account
         }).then((res) => {
             this.newNFT.id      = _id;
+            this.newNFT.wish    = this.form.wish;
+            this.newNFT.name    = this.form.name;
+            this.newNFT.guardian= this.form.guardian;
             this.newNFT.DNA     = res.DNA;
             this.newNFT.gammaID = res.gammaNekoID;
             this.newNFT.power   = res.power; 
             this.newNFT.refCount= res.refCount;
-            this.newNFT.wish    = this.form.wish;
 
             console.log('gen new NFT',this.newNFT);
             this.generateFile ();
