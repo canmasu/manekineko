@@ -16,15 +16,13 @@
       </div>
     
     <el-table  :data="deals.filter(data => !search || data.TokenID.includes(search))" stripe style="width: 100%">
-        <el-table-column prop="url" label="url">
-            <template slot-scope="scope">
-                <img :src="scope.row.url"/>
-            </template>
-        </el-table-column>
-        <el-table-column prop="Seller" label="Seller" > </el-table-column>
-        <el-table-column prop="Exchange" label="Exchange" > </el-table-column>
-        <el-table-column prop="TokenID" label="招き猫 #"> </el-table-column>   
-        
+     
+        <el-table-column prop="tokenId" label="招き猫 #"> </el-table-column>   
+        <el-table-column prop="owner" label="Seller" > </el-table-column>
+        <el-table-column prop="approved" label="Exchange" > </el-table-column>
+     
+
+       
         <el-table-column align="right">
             <template  slot="header">
                 <el-input v-model="search" size="mini" placeholder="Token ID"/>
@@ -48,6 +46,7 @@
         </el-table-column>         
     </el-table>
 
+    <el-alert title="Loading ..." type="warning" show-icon v-if="isAlert"></el-alert>
     </el-card>
     </div>
 </template>
@@ -63,14 +62,16 @@ const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
 export default {
   data() {
     return {
+      deals : [],
       activeIndex: '1',
       web3: null,
       account: null,
       contract :[],
       totalDeals:0,
-      deals : [],
       search :0,
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      data : [],
+      isAlert : false,
     };
   },
 
@@ -104,30 +105,31 @@ export default {
   methods:{
 
     getApprovedDeal(){
+    this.isAlert = true;
 
-        this.contract.collectibles.getPastEvents('Approval', {
-            filter: { owner: this.account },
-            fromBlock: 0,
-            toBlock: 'latest'
-        }, function(error, events){ 
+    this.contract.collectibles.getPastEvents('Approval', {
+      filter: { owner: this.account },
+      fromBlock: 0,
+      toBlock: 'latest'
+      }).then((events) => {
 
-            console.log('Approval : ', events);
+        for (let i=0; i < events.length ; i++){
+          console.log('i  :', i);
+          if(events[i].returnValues.approved !='0x0000000000000000000000000000000000000000'){
+            this.deals.push({
+              approved : events[i].returnValues.approved,
+              owner : events[i].returnValues.owner,
+              tokenId : events[i].returnValues.tokenId
+            })
+          }
+          
+        }
 
-            for (let i=0; i < events.length ; i++){
-                this.deals.push({
-                    Exchange: events[i].returnValues.approved,
-                    Seller  : events[i].returnValues.owner,
-                    TokenID : events[i].returnValues.tokenId
-                });
-                
-            }
-           
-           
-            console.log('Deals : ', this.deals);
-
-        });
-
-
+        console.log('Approval : ', events);
+        console.log('events length :', events.length);
+        console.log('Deals : ', this.deals);
+        this.isAlert = false;
+      })
     },
   }
   
