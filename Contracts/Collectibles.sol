@@ -168,6 +168,8 @@ contract NekoCollectibles is ERC721 {
     event DEVELOPER (address indexed payee,  uint256 amount,uint256 timestamp);
     
     event BONUS (address indexed payee, uint256 gammaNekoID, uint256 amount, uint256 timestamp);
+    
+    event GIFT (address indexed sender, address indexed receiver,  uint256 NekoId);
 
 
     function addNewCEO (address _newAddress) external onlyCEO{
@@ -522,6 +524,7 @@ contract NekoCollectibles is ERC721 {
      */
     function sendAsGift (address receiverAddrs , uint256 tokenId) public {
         transferFrom(msg.sender, receiverAddrs, tokenId);
+        emit GIFT (msg.sender, receiverAddrs,  tokenId);
         
         Clubhouse Contract = Clubhouse(clubhouseContract);
         
