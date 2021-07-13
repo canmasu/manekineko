@@ -87,12 +87,12 @@
 import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
+const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
 
 
 // Contract : Collectibles Paymnet
 import abi_payment from '../web3/abi_payment';
-const contract_payment = '0xAFD04827187a6B1488F57cf10f1608ABd019C4Ea';
+const contract_payment = '0xB98ACE202eEf57896263CfC89257A78a9C6B29cF';
 
 
 // Contract : ERC20 - $NEKO

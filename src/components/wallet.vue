@@ -1,9 +1,10 @@
 <template>
     <div>
 
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" >
-        <el-menu-item index="1">Gift received</el-menu-item>
-        <el-menu-item index="3">Gift sent</el-menu-item>
+      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router>
+        <el-menu-item index="/receivedgift">Gifts</el-menu-item>
+        <el-menu-item index="/sentgift">Sent</el-menu-item>
+        <el-menu-item index="/tradehistory">Trade History</el-menu-item>
       </el-menu>
 
     <el-card>
@@ -118,10 +119,10 @@
 import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
+const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
 
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0x3Cd4B1b772629dCe341D8f1Db0B94aEba9964236';
+const contract_exchange = '0x9B206bDA6B505AAe9af79a61d268f4698660D8E2';
 
 // Contract : ERC20 - $NEKO
 import abi_neko from '../web3/abi_neko';
@@ -262,10 +263,10 @@ export default {
 
             for (let i = 0; i < res.length; i += 1) {
                 // retrive NFT Details
-                this.contract.collectibles.methods.getNekoDetails(res[i]).call({
+                this.contract.collectibles.methods.Nekos(res[i]).call({
                     from: this.account,
                 }).then((Neko) => {
-                    var generation = parseInt(Neko[2].substr(32, 6));
+                    var generation = parseInt(Neko[1].substr(32, 6));
                     var gen_Display = 0;
 
                     if (generation<6){
@@ -279,10 +280,10 @@ export default {
                     }
 
                     this.NFTs.push({
-                        id: Neko[0],
-                        power: Neko[1],
-                        DNA: Neko[2],
-                        url: 'https://nft.neko.exchange/' + Neko[0] + '.svg',
+                        id: res[i],
+                        power: Neko[0],
+                        DNA: Neko[1],
+                        url: 'https://nft.neko.exchange/' + res[i] + '.svg',
                         gen : gen_Display,
                     });
 

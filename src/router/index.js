@@ -15,6 +15,8 @@ import Clubhouse from '../components/clubhouse.vue'
 import OpenDeal from '../components/opendeal.vue'
 import ApprovedDeal from '../components/approveddeal.vue'
 import TradeHistory from '../components/tradehistory.vue'
+import ReceivedGift from '../components/receivedgift.vue'
+import SentGift from '../components/sentgift.vue'
 
 
 Vue.use(VueRouter)
@@ -27,6 +29,8 @@ const routes = [
     children : [
       {path: '/welcome', component:Welcome },
       {path: '/wallet', component:Wallet },
+      {path: '/receivedgift', component:ReceivedGift },
+      {path: '/sentgift', component:SentGift },
       {path: '/trade', component:Trade },
       {path: '/opendeal', component:OpenDeal },
       {path: '/approveddeal', component:ApprovedDeal },

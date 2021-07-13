@@ -99,7 +99,7 @@ import getWeb3 from '../web3/web3';
 
 // Contract : Exchange
 import abi_exchange from '../web3/abi_exchange';
-const contract_exchange = '0x3Cd4B1b772629dCe341D8f1Db0B94aEba9964236';
+const contract_exchange = '0x9B206bDA6B505AAe9af79a61d268f4698660D8E2';
 
 // Contract : ERC20 - $NEKO
 import abi_neko from '../web3/abi_neko';

@@ -40,7 +40,7 @@ import RadarChart from '../charts/RadarChart';
 import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
+const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
 
 
 export default {

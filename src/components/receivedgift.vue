@@ -2,24 +2,19 @@
     <div class="sales_container">
 
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router>
-        <el-menu-item index="/opendeal">Open deal</el-menu-item>
-        <el-menu-item index="approveddeal">Approved deal</el-menu-item>
-        <el-menu-item index="/tradehistory">Trade History</el-menu-item>
+        <el-menu-item index="/receivedgift">Received</el-menu-item>
+        <el-menu-item index="/sentgift">Sent</el-menu-item>
       </el-menu>
 
 
     <el-card>
-      <div> Decenterlized NFT Trading 
-      NFTs Valuation 
-      Select NFT > Payment Method > Buy
-      Select NFT > Set a price > Sell
-      </div>
+      <div> Gift </div>
     
     <el-table  :data="deals.filter(data => !search || data.TokenID.includes(search))" stripe style="width: 100%">
      
         <el-table-column prop="tokenId" label="招き猫 #"> </el-table-column>   
-        <el-table-column prop="owner" label="Seller" > </el-table-column>
-        <el-table-column prop="approved" label="Exchange" > </el-table-column>
+        <el-table-column prop="sender" label="Seller" > </el-table-column>
+        <el-table-column prop="receiver" label="Exchange" > </el-table-column>
      
 
        
@@ -107,27 +102,25 @@ export default {
     getApprovedDeal(){
     this.isAlert = true;
 
-    this.contract.collectibles.getPastEvents('Approval', {
-      filter: { owner: this.account },
+    this.contract.collectibles.getPastEvents('GIFT', {
+      filter: { receiver: this.account },
       fromBlock: 0,
       toBlock: 'latest'
       }).then((events) => {
 
         for (let i=0; i < events.length ; i++){
           console.log('i  :', i);
-          if(events[i].returnValues.approved !='0x0000000000000000000000000000000000000000'){
             this.deals.push({
-              approved : events[i].returnValues.approved,
-              owner : events[i].returnValues.owner,
-              tokenId : events[i].returnValues.tokenId
+              sender    : events[i].returnValues.sender,
+              receiver  : events[i].returnValues.receiver,
+              tokenId   : events[i].returnValues.NekoId
             })
-          }
           
         }
 
-        console.log('Approval : ', events);
+        console.log('GIFT : ', events);
         console.log('events length :', events.length);
-        console.log('Deals : ', this.deals);
+        console.log('Gifts : ', this.deals);
         this.isAlert = false;
       })
     },

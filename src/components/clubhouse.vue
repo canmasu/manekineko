@@ -26,7 +26,7 @@ import abi_clubhouse from '../web3/abi_clubhouse';
 const contract_clubhouse = '0x9Da0Db278C51d425E3d31Fe92DAAE3B91D016FB9';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0x8e2F7e97f07bF6454a62FAECb4402A62B7C57e22';
+const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
 
 export default {
     data(){
