@@ -113,6 +113,9 @@ export default {
                 //get current signed wallet address
                 this.web3.eth.getAccounts().then((accounts) => {
                     [this.account] = accounts;
+                    this.getBNBPrice('BNBUSDT');
+                    this.getBNBPrice('CAKEUSDT');
+                    this.getBNBPrice('BAKEUSDT');
 
                 }).catch((err) => {
                     console.log(err, 'err!!');
@@ -147,6 +150,18 @@ export default {
                 ]
             }
             console.log('filling oppotunity:',b);
+        },
+        async getBNBPrice(symbol){
+            const axios = require('axios');
+            await axios.get('https://api.binance.com/api/v3/ticker/price?symbol='+symbol)
+            .then((res) => {
+                console.log ('BNB  :',res.data);
+                //import data form metadata
+
+            }).catch((err) => {
+                console.log(err, 'err');
+            });    
+
         },
         async getMetadata(id){
             const axios = require('axios');
