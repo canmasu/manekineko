@@ -4,17 +4,18 @@
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router>
         <el-menu-item index="/receivedgift">Gifts</el-menu-item>
         <el-menu-item index="/sentgift">Sent</el-menu-item>
-        <el-menu-item index="/tradehistory">Trade History</el-menu-item>
       </el-menu>
 
     <el-card>
         <div> My Walllet address : {{account}}</div>
-        <div> BALANCE </div>
-        <div> BNB  : {{parseFloat(balance.BNB/10**18).toFixed(2)}}</div>
-        <div> NEKO : {{(balance.NEKO/10**18).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}}</div>
-        <div> CAKE : {{(balance.CAKE/10**18).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}}</div>
-        <div> BAKE : {{(balance.BAKE/10**18).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}}</div>
+        <div> BALANCE </div> 
 
+    <el-table :data="coinBalance" stripe style="width: 100%">
+        <el-table-column prop="label" label="Coin"> </el-table-column>
+        <el-table-column prop="balance" label="Balance"> </el-table-column>
+        <el-table-column prop="price" label="Val(USD)"> </el-table-column>
+
+    </el-table>
 
 
     <el-table  :data="NFTs.filter(data => !search || data.id.toLowerCase().includes(search.toLowerCase()))" stripe style="width: 100%">
@@ -174,12 +175,8 @@ export default {
                 receiverAddr:''
             },
             formLabelWidth: '120px',
-            balance : {
-                BNB :0,
-                NEKO : 0,
-                CAKE : 0,
-                BAKE : 0
-            }
+            coinBalance : [],
+            coinPrice :'',
 
         }
     },
@@ -204,21 +201,37 @@ export default {
                 this.web3.eth.getAccounts().then((accounts) => {
                     this.account = accounts[0];
                     this.getNFTOwned();
-                    this.getNekoBalance();
-                    this.getCakeBalance();
-                    this.getBakeBalance();
 
                     //get BNB balance
                     this.web3.eth.getBalance(this.account).then((res) => {
-                        
+                    
+                      
+
+                            const axios = require('axios');
+                            axios.get('https://api.binance.com/api/v3/ticker/price?symbol=BNBUSDT')
+                            .then((binance) => {
+
+                                this.coinBalance.push({
+                                    label : 'BNB',
+                                    balance : res/10**18,
+                                    price   : parseFloat(binance.data.price),
+                                })
+
+                                // get NEKO, CAKE and BAKE balance
+                                this.getNekoBalance();
+                                this.getCakeBalance();
+                                this.getBakeBalance();
+
+                            }).catch((err) => {
+                                console.log(err, 'err');
+                            });   
+                    
+
                         console.log('BNB bal :', res);
-                        this.balance.BNB = res;
 
                     }).catch((err) => {
                         console.log(err, 'err!!');
                     });
-
-
 
                 }).catch((err) => {
                     console.log(err, 'err!!');
@@ -233,25 +246,62 @@ export default {
             }
     },
     methods :{
+
         getNekoBalance (){
             this.contract.neko.methods.balanceOf(this.account).call({
             }).then((res) => {
-                this.balance.NEKO = res;
-                console.log('NEKO bal: ', res);
+                const axios = require('axios');
+
+                //BSC Mainnet   https://bsc.api.0x.org/swap/v1/quote?buyToken=USDC&sellToken=BNB&sellAmount=1000000000000000000
+                
+                axios.get('https://bsc.api.0x.org/swap/v1/quote?buyToken=BNB&sellToken=0x41b49c45a1a033e85704b3c0cb34c37d202e42c9&sellAmount=1000000000000000000')
+                .then((binance) => {
+
+                    this.coinBalance.push({
+                        label : 'NEKO',
+                        balance : res/10**18,
+                        price   : parseFloat(binance.data.price),
+                    })
+                    console.log('Swap data: ', binance.data);
+                })
             })
         },
-        getCakeBalance (){
-            this.contract.cake.methods.balanceOf(this.account).call({
+        async getCakeBalance (){
+            await this.contract.cake.methods.balanceOf(this.account).call({
             }).then((res) => {
-                this.balance.CAKE = res;
-                console.log('CAKE bal: ', res);
+
+                const axios = require('axios');
+                axios.get('https://api.binance.com/api/v3/ticker/price?symbol=CAKEUSDT')
+                .then((binance) => {
+
+                    this.coinBalance.push({
+                        label : 'CAKE',
+                        balance : res/10**18,
+                        price   : parseFloat(binance.data.price)/res,
+                    })
+
+                }).catch((err) => {
+                    console.log(err, 'err');
+                });   
             })
         },
-        getBakeBalance (){
-            this.contract.bake.methods.balanceOf(this.account).call({
+        async getBakeBalance (){
+            await this.contract.bake.methods.balanceOf(this.account).call({
             }).then((res) => {
-                this.balance.BAKE = res;
-                console.log('BAKE bal: ', res);
+
+                const axios = require('axios');
+                axios.get('https://api.binance.com/api/v3/ticker/price?symbol=BAKEUSDT')
+                .then((binance) => {
+
+                    this.coinBalance.push({
+                        label : 'BAKE',
+                        balance : res/10**18,
+                        price   : parseFloat(binance.data.price),
+                    })
+
+                }).catch((err) => {
+                    console.log(err, 'err');
+                });   
             })
         },
         getNFTOwned (){        
