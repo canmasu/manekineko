@@ -19,9 +19,9 @@
                     <span slot="title">Trade</span>
                 </el-menu-item>
 
-                <el-menu-item index="/mint">
+                <el-menu-item index="/wish/guardian">
                     <i class="iconfont icon-dollar"></i>
-                    <span slot="title">Mint</span>
+                    <span slot="title">Make a wish</span>
                 </el-menu-item>
 
                 <el-menu-item index="/wallet">

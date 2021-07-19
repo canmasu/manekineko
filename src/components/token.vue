@@ -11,6 +11,8 @@
         <div> DNA : {{NFT.art_dna}} </div>
         <div> Guardian : {{NFT.guardian}} </div>
         <div> Gamma : {{NFT.gamma}} </div>
+        <div> Scarcity : {{NFT.scarcity}} % </div>
+        <div> Valuation : USD {{NFT.valuation}} </div>
 
         <el-image :src="NFT.image" class="nft-image">
             <div slot="placeholder" class="image-slot">
@@ -63,6 +65,8 @@ export default {
                 wish    : ''
             },
             NFT: {
+                valuation : null,
+                scarcity  : null,
                 name:null,
                 description:null,
                 external_url:null,
@@ -151,13 +155,38 @@ export default {
             }
             console.log('filling oppotunity:',b);
         },
+        getValuation (pow){
+            //valuation return the decimal within 0 - 1
+            //scarcity 0 - 100%
+            var Power = pow/2;
+            var Mean  = 250000;
+            var Range = 250000;
+            var BasePrice = 10.00;
+
+            if (Power>250000){
+                // power above 250k
+                this.NFT.valuation = (((Power-Mean)/100000)**5)/97.65625;
+            } else {
+                // power below 250k
+                this.NFT.valuation = (((Range-Power)/100000)**5)/97.65625;
+            }
+            
+            // x10
+            this.NFT.scarcity = parseFloat(this.NFT.valuation * 100).toFixed(4);
+            this.NFT.valuation = parseFloat(BasePrice + this.NFT.valuation * 500).toFixed(4);
+
+
+            console.log ('valuation :', this.NFT.valuation);
+            console.log ('Power :', pow);
+
+
+        },
         async getBNBPrice(symbol){
             const axios = require('axios');
             await axios.get('https://api.binance.com/api/v3/ticker/price?symbol='+symbol)
             .then((res) => {
                 console.log ('BNB  :',res.data);
                 //import data form metadata
-
             }).catch((err) => {
                 console.log(err, 'err');
             });    
@@ -180,6 +209,7 @@ export default {
                 this.NFT.wish = res.data.wish;
                 this.NFT.attributes = res.data.attributes;
 
+                //fill in data for charting
                 this.fillData(
                     parseInt(res.data.attributes[5].value),
                     parseInt(res.data.attributes[6].value),
@@ -187,6 +217,9 @@ export default {
                     parseInt(res.data.attributes[8].value),
                     parseInt(res.data.attributes[9].value)
                     );
+
+                //make valuation
+                this.getValuation(res.data.attributes[3].value.toString().replace(',', ''));
 
                 console.log('chartData wealth: ', res.data.attributes[6].value);
 

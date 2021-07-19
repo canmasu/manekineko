@@ -39,11 +39,16 @@
         <el-table-column prop="DNA" label="DNA"> </el-table-column>
         <el-table-column prop="power" label="power"> </el-table-column>
 
-        <el-table-column align="right" :min-width="120">
+        <el-table-column align="right" :min-width="150">
             <template slot-scope="scope">
-                    <el-button size="mini"> <router-link :to="'/token/' +scope.row.id+ '/0x0'">View </router-link></el-button>   
-                    <el-button size="mini" type="info" @click="sendGift(scope.row.id)"> Gift </el-button>
-                    <el-button size="mini" type="primary" @click="wantToSell(scope.row.id)"> Sell </el-button>
+                    <el-button size="mini" @click="sendGift(scope.row.id)">Gift</el-button>
+                    <el-button size="mini" @click="wantToSell(scope.row.id)">Sell</el-button>
+                    <router-link :to="'/token/' +scope.row.id+ '/0x0'">
+                        <el-button size="mini"> View </el-button>  
+                    </router-link> 
+                    <router-link :to="'/wish/' + scope.row.id">
+                        <el-button size="mini" type="primary" >Wish</el-button>
+                    </router-link>
             </template>
 
         </el-table-column>   

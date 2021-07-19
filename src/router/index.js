@@ -10,7 +10,7 @@ import Manekineko from '../components/manekineko.vue'
 import Analytics from '../components/analytics.vue'
 import Contact from '../components/contact.vue'
 import Token from '../components/token.vue'
-import Mint from '../components/mint.vue'
+import Wish from '../components/wish.vue'
 import Clubhouse from '../components/clubhouse.vue'
 import OpenDeal from '../components/opendeal.vue'
 import ApprovedDeal from '../components/approveddeal.vue'
@@ -38,7 +38,7 @@ const routes = [
       {path: '/launchpad', component:Launchpad },
       {path: '/manekineko', component:Manekineko },
       {path: '/clubhouse', component:Clubhouse },
-      {path: '/mint', component:Mint },
+      {path: '/wish/:guardian', component:Wish },
       {path: '/analytics', component:Analytics },
       {path: '/contact', component:Contact },
       {path: '/token/:id/:ref', component:Token }
