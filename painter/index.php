@@ -22,6 +22,7 @@ header('Content-Type: application/json');
 $_POST = json_decode(file_get_contents("php://input"),true);
 
 // required 3 input. DNA , Wish and NFT_Id
+$transactionHash= $_POST['transactionHash'];
 $nftID    = $_POST['id'];
 $wish     = $_POST['wish'];
 $name     = $_POST['name'];
@@ -29,6 +30,7 @@ $guardian = $_POST['guardian'];
 $energies = $_POST['DNA'];
 $gammaID  = $_POST['gammaID'];
 $power    = $_POST['power'];
+
 
 
      /**
@@ -427,8 +429,9 @@ Array (
     "description" => $wish,
     "external_url" => "https://nft.neko.exchange/",
     "image" => 'https://nft.neko.exchange/'.$nftID.'.svg',
+    "transactionHash" => $transactionHash,
     "name" => $name,
-    "id" => '招き猫 #'.$nftID,
+    "id" => $nftID,
     "art_dna" => $energies,
     "guardian" => $guardian,
     "gamma" => $gammaID

@@ -1,34 +1,60 @@
 <template>
     <div>
+        <!-- Image -->
+        <el-card  style="width: 40%">
+            <el-image :src="NFT.image" class="nft-image">
+                <div slot="placeholder" class="image-slot">
+                    loading<span class="dot">...</span>
+                </div>
+                <div slot="error" class="image-slot" @click="imageLoadError()">
+                    <i class="el-icon-picture-outline"></i>
+                </div>
+            </el-image>
+        </el-card> 
 
-        <router-link :to="'/token/' + $route.params.id"> 
-        <div>Neko collectibles Token : {{ $route.params.id }}</div>
-        </router-link>
 
-        <div> Neko's name :{{NFT.name}}</div>
-        <div> Wish :{{NFT.description}}</div>
-        <div> URL : {{NFT.external_url}} </div>
-        <div> DNA : {{NFT.art_dna}} </div>
-        <div> Guardian : {{NFT.guardian}} </div>
-        <div> Gamma : {{NFT.gamma}} </div>
-        <div> Scarcity : {{NFT.scarcity}} % </div>
-        <div> Valuation : USD {{NFT.valuation}} </div>
+        <!-- valuation -->
+        <el-card  style="width: 40%">
+            <el-table  :data="valuation" stripe>
+                <el-table-column prop="trait_type" label="VAULATION" width="250"> </el-table-column>
+                <el-table-column prop="value"  width="250"> </el-table-column>      
+            </el-table>
 
-        <el-image :src="NFT.image" class="nft-image">
-            <div slot="placeholder" class="image-slot">
-                loading<span class="dot">...</span>
-            </div>
-            <div slot="error" class="image-slot" @click="imageLoadError()">
-                <i class="el-icon-picture-outline"></i>
-            </div>
-        </el-image>
+            <el-button size="mini" @click="sendGift(scope.row.id)">Gift</el-button>
+            <el-button size="mini" @click="wantToSell(scope.row.id)">Sell</el-button>
+            <router-link :to="'/wish/' + $route.params.id">
+                <el-button size="mini" type="primary" >Wish</el-button>
+            </router-link>
+        </el-card>
 
-        <radar-chart :chart-data="chartData" :options="options"></radar-chart>
 
-        <el-table  :data="NFT.attributes" stripe style="width: 50%">
-            <el-table-column prop="trait_type" label="trait_type" width="250"> </el-table-column>
-            <el-table-column prop="value" label="value #" width="250"> </el-table-column>      
-        </el-table>
+        <!-- Certificate -->
+        <el-card style="width: 82%">
+            <el-table  :data="certificate" stripe>
+                <el-table-column prop="trait_type" label="Birth Certificaiton" width="200"> </el-table-column>
+                <el-table-column prop="value" > </el-table-column>      
+            </el-table>
+            <el-link :href=NFT.txURL target="_blank" class="linkVerify" type="primary">Varify Certificate</el-link>
+        </el-card>
+
+        <!-- Chart -->
+        <el-card  style="width: 40%">
+            <radar-chart :chart-data="chartData" :options="options"></radar-chart>
+        </el-card>
+
+        <!-- Maneki Power -->
+        <el-card  style="width: 40%">
+            <el-table  :data="NFT.attributes" stripe>
+                <el-table-column prop="trait_type" label="MANEKI POWER" width="250"> </el-table-column>
+                <el-table-column prop="value" label="value #" width="250"> </el-table-column>      
+            </el-table>
+        </el-card>
+
+ 
+
+
+
+       
 
 
 
@@ -45,6 +71,11 @@ import abi_collectible from '../web3/abi_collectible';
 const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
 
 
+// Contract : Collectibles Paymnet
+import abi_payment from '../web3/abi_payment';
+const contract_payment = '0xB98ACE202eEf57896263CfC89257A78a9C6B29cF';
+
+
 export default {
     components: {
         RadarChart
@@ -54,7 +85,8 @@ export default {
             contractInstance:null,
             account:null,
             contract :{
-                collectibles:null
+                collectibles:null,
+                payment:null,
             },
             newNFT : {
                 id      : '',
@@ -65,6 +97,8 @@ export default {
                 wish    : ''
             },
             NFT: {
+                transactionHash : null,
+                txURL     : null,
                 valuation : null,
                 scarcity  : null,
                 name:null,
@@ -94,16 +128,17 @@ export default {
                 scale: {
                     ticks: {
                     min: 0,
-                    max: 100,
-                    stepSize: 25
+                    max: 99999,
+                    stepSize: 30000
                     }
                 }
             },
+            valuation : [],
+            certificate : [],
         }
     },
     mounted() {
         this.getMetadata(this.$route.params.id);
-
         if (typeof web3 !== 'undefined') {
     
             console.log('Metamask is installed!');
@@ -113,6 +148,7 @@ export default {
 
                 //connect Contracts Collectibles
                 this.contract.collectibles = new this.web3.eth.Contract(abi_collectible, contract_collectible);
+                this.contract.payment = new this.web3.eth.Contract(abi_payment, contract_payment);
    
                 //get current signed wallet address
                 this.web3.eth.getAccounts().then((accounts) => {
@@ -120,6 +156,10 @@ export default {
                     this.getBNBPrice('BNBUSDT');
                     this.getBNBPrice('CAKEUSDT');
                     this.getBNBPrice('BAKEUSDT');
+
+                    // get transaction hash
+                    //this.gettransactionHash();
+
 
                 }).catch((err) => {
                     console.log(err, 'err!!');
@@ -132,6 +172,15 @@ export default {
 
     },
     methods :{
+        popWish(name, msg) {
+            this.$notify.success({
+                title: msg,
+                message: name,
+                showClose: false,
+                duration: 50000,
+                position: 'bottom-right'
+            });
+        },
         fillData (a,b,c,d,e) {
 
             console.log('pre-filling :');
@@ -155,6 +204,37 @@ export default {
             }
             console.log('filling oppotunity:',b);
         },
+        getCertificate (){
+
+            this.certificate.push ({
+                trait_type: 'Token ID',
+                value: this.$route.params.id,
+            });
+
+            this.certificate.push ({
+                trait_type: 'Name',
+                value: this.NFT.name,
+            });
+
+            this.certificate.push ({
+                trait_type: 'Guardian',
+                value: this.NFT.guardian,
+            });
+            this.certificate.push ({
+                trait_type: 'Gamma',
+                value: this.NFT.gamma,
+            });
+            this.certificate.push ({
+                trait_type: 'DNA',
+                value: this.NFT.art_dna,
+            });
+            this.certificate.push ({
+                trait_type: 'Blockchain Certificate',
+                value: this.NFT.transactionHash,
+            });
+
+
+        },
         getValuation (pow){
             //valuation return the decimal within 0 - 1
             //scarcity 0 - 100%
@@ -172,9 +252,49 @@ export default {
             }
             
             // x10
-            this.NFT.scarcity = parseFloat(this.NFT.valuation * 100).toFixed(4);
+            if (this.NFT.valuation * 100 < 18.8 ){
+                this.NFT.scarcity = 18.8 + this.NFT.valuation * 10;
+            } else {
+                this.NFT.scarcity = this.NFT.valuation * 100;
+            }
             this.NFT.valuation = parseFloat(BasePrice + this.NFT.valuation * 500).toFixed(4);
 
+            // store data to valuation
+
+            this.valuation.push ({
+                trait_type: 'Valuation',
+                value: this.NFT.valuation,
+            })
+
+            this.valuation.push ({
+                trait_type: 'Luckiness',
+                value: this.NFT.scarcity,
+            })
+
+            this.valuation.push ({
+                trait_type: 'Limited',
+                value: 'Yes',
+            })
+
+            this.valuation.push ({
+                trait_type: 'Transcacted',
+                value: 5,
+            })
+
+            this.valuation.push ({
+                trait_type: 'Coins invited',
+                value: 123132132,
+            })
+
+            this.valuation.push ({
+                trait_type: 'Gamma',
+                value: this.NFT.gamma,
+            })
+
+            this.valuation.push ({
+                trait_type: 'Guardian',
+                value: this.NFT.guardian,
+            })
 
             console.log ('valuation :', this.NFT.valuation);
             console.log ('Power :', pow);
@@ -198,6 +318,8 @@ export default {
             .then((res) => {
                 console.log ('metadata :',res.data);
                 //import data form metadata
+                this.NFT.transactionHash = res.data.transactionHash;
+                this.NFT.txURL  = 'https://testnet.bscscan.com/tx/'+ res.data.transactionHash;
                 this.NFT.name = res.data.name;
                 this.NFT.id = res.data.id;
                 this.NFT.guardian = res.data.guardian;
@@ -206,20 +328,25 @@ export default {
                 this.NFT.external_url = res.data.external_url;
                 this.NFT.art_dna = res.data.art_dna;
                 this.NFT.image = res.data.image;
-                this.NFT.wish = res.data.wish;
                 this.NFT.attributes = res.data.attributes;
 
                 //fill in data for charting
                 this.fillData(
-                    parseInt(res.data.attributes[5].value),
-                    parseInt(res.data.attributes[6].value),
-                    parseInt(res.data.attributes[7].value),
-                    parseInt(res.data.attributes[8].value),
-                    parseInt(res.data.attributes[9].value)
+                    parseInt(res.data.attributes[5].value.toString().replace(',', '')),
+                    parseInt(res.data.attributes[6].value.toString().replace(',', '')),
+                    parseInt(res.data.attributes[7].value.toString().replace(',', '')),
+                    parseInt(res.data.attributes[8].value.toString().replace(',', '')),
+                    parseInt(res.data.attributes[9].value.toString().replace(',', ''))
                     );
 
                 //make valuation
                 this.getValuation(res.data.attributes[3].value.toString().replace(',', ''));
+
+                //pop out wish message
+                this.popWish(this.NFT.name +' bring this wish come true!', this.NFT.description);
+
+                //birth certification 
+                this.getCertificate();
 
                 console.log('chartData wealth: ', res.data.attributes[6].value);
 
@@ -229,10 +356,29 @@ export default {
         },
         imageLoadError () {
             console.log('Image failed to load');
-            this.generateNewNFT(this.$route.params.id);
+            this.generateNewNFT(this.$route.params.id,);
         },
         async generateNewNFT(_id){
-            await this.contract.collectibles.methods.Nekos(_id).call({
+
+            // get transactionHash
+            await this.contract.payment.getPastEvents('PAYMENT', {
+                filter: { payee: this.account },
+                fromBlock: 0,
+                toBlock: 'latest'
+            }).then((events) => {  
+            
+            //received transactionHash
+            for( let i =0 ; i < events.length ; i++){
+                    if(events[i].returnValues._nftID==this.$route.params.id){
+                        this.NFT.transactionHash = events[i].transactionHash;
+                        console.log('transactionHash : ',events[i].transactionHash);
+                    }
+            }
+
+            //start generate Image and Metadata
+
+
+            this.contract.collectibles.methods.Nekos(_id).call({
             from: this.account
             }).then((res) => {
                 this.newNFT.id      = _id;
@@ -246,6 +392,13 @@ export default {
                 this.generateFile ();
                 
             })
+
+
+            }).catch((err) => {
+                console.log(err, 'err');
+            });
+
+
         },
         async generateFile (){
                 // generate Metadata and GIF
@@ -254,6 +407,7 @@ export default {
                 //this.$router.go();
         },
 
+     
     }
 }
 
@@ -261,7 +415,14 @@ export default {
 
 <style scoped>
 .nft-image {
-    width:500px;
-    height: 500px;
+    width:400px;
+    height: 400px;
+}
+.el-card {
+    float:left;
+}
+.linkVerify {
+    padding: 10px;
+    float:right;
 }
 </style>

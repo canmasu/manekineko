@@ -62,7 +62,7 @@ const PaymentGateway = '0x5c573535C3E0e9deB802D884F4D4CA766A85b355';
 const contractPayment = new web3.eth.Contract(CollectiblePaymentABI,PaymentGateway);
 
 // Contract : ERC20 - $NEKO
-import NekoABI from '../web3/abi_neko';
+import NekoABI from '../../web3/abi_neko';
 const contractAddressNeko = '0xdF3CF86Faed8a1936F3dB48a374E981e3fFC3164';
 const contractNeko = new web3.eth.Contract(NekoABI,contractAddressNeko);
 

@@ -126,7 +126,7 @@ contract PaymentGateway {
 
 
     event ROLES (address user, uint256 role, bool status);
-    event PAYMENT (address indexed payee, uint256 _nftID, IERC20 indexed token, uint256 amount);
+    event PAYMENT (address indexed payee, uint256 indexed _nftID, IERC20 indexed token, uint256 amount);
     event ADDPAYMENTTOKEN (IERC20 indexed _tokenAddress, string indexed _tokenSymbol, uint256 _tokenQuantity);
     event UPDATETOKENRATE (IERC20 indexed _tokenAddress, uint256 _tokenAmount);
     

@@ -18,7 +18,13 @@
     </el-table>
 
 
-    <el-table  :data="NFTs.filter(data => !search || data.id.toLowerCase().includes(search.toLowerCase()))" stripe style="width: 100%">
+    <el-table  
+        v-loading="loading"
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading"
+        element-loading-background="rgba(0, 0, 0, 0.8)"
+        :data="NFTs.filter(data => !search || data.id.toLowerCase().includes(search.toLowerCase()))" stripe style="width: 100%">
+
         <el-table-column prop="url" label="url">
             <template slot-scope="scope">
                 <el-image :src="scope.row.url" class="nft-image">
@@ -148,6 +154,7 @@ export default {
             isCollapse:false,
             tokenSupply:0,
             name:null,
+            loading : true,
 
             // NFT 
             NFT : {
@@ -316,6 +323,7 @@ export default {
                 from: this.account,
             }).then((res) => {
 
+
             for (let i = 0; i < res.length; i += 1) {
                 // retrive NFT Details
                 this.contract.collectibles.methods.Nekos(res[i]).call({
@@ -346,6 +354,7 @@ export default {
                     console.log(err, 'err');
                 });
             }
+            this.loading = false;
 
             }).catch((err) => {
                 console.log(err, 'err');

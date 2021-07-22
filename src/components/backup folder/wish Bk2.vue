@@ -1,5 +1,5 @@
 <template>
-    
+    <!-- Minting with Single form Process -->
     <div class="mint_container">
         <!-- Form -->
 
@@ -15,14 +15,9 @@
 
 
         <el-card>
-        
-        <h1> Make your wish! </h1>
+        <el-form :model="form" :rules="wishRules" ref="wishForm">
 
-        <!-- Form - Part 1, Guadian  -->
-        <el-form :model="form"  v-if="display.isGuardian" :rules="wishRules" ref="guardianForm">
             <el-form-item label="Guardian" prop="guardian" :label-width="formLabelWidth">
-
-                <div> Pick a trustable Meow to be your wish </div>
                 <div> 招き猫 {{ newNFT.guardian}} 
                 <router-link :to="'/wallet'"> 
                     <el-button icon="el-icon-search" circle ></el-button> 
@@ -30,59 +25,22 @@
                 </div> 
             </el-form-item>
 
-            <el-form-item class="dialog-footer">
-                <el-button type="primary" @click="gotoWish()">Ok</el-button>
-            </el-form-item>
-        </el-form>
-
-
-        <!-- Form - Part 2, Wish  -->
-
-        <el-form :model="form" v-if="display.isWish" :rules="wishRules" ref="wishForm">
-
-            <el-form-item label="Wish" prop="wish" :label-width="formLabelWidth">
-                <div>Meow-meow would like to make you wish come true.</div>
-                <el-input v-model="form.wish" placeholder="I'wish ... " ></el-input>
+            <el-form-item label="Name" prop="name" :label-width="formLabelWidth">
+                <el-input v-model="form.name" placeholder="Give your neko a name" ></el-input>
             </el-form-item>
 
-            <el-form-item  class="dialog-footer">
-                <el-button type="text" @click="gotoGuardian()">Back</el-button>
-                <el-button type="primary" @click="gotoName('wishForm')">Ok</el-button>
-            </el-form-item>
-        </el-form>
-
-
-        <!-- Form - Part 3, name  -->
-        
-        <el-form :model="form" v-if="display.isName" :rules="nameRules" ref="nameForm">
-            <el-form-item label="Meow's Name" prop="name" :label-width="formLabelWidth">
-                <div> Not all Meow would like to have name.</div>
-                <el-input v-model="form.name" placeholder="But, I still want give a name" ></el-input>
+            <el-form-item label="Message" prop="wish" :label-width="formLabelWidth">
+                <el-input v-model="form.wish" placeholder="Write you wish here" ></el-input>
             </el-form-item>
 
-            <el-form-item class="dialog-footer">
-                <el-button type="text" @click="backtoWish()">Back</el-button>
-                <el-button type="primary" @click="gotoPayment('nameForm')">Ok</el-button>
-            </el-form-item>
-        </el-form>
-
-
-        <!-- Form - Part 4, Payment  -->
-        <el-form :model="form" v-if="display.isPayment" :rules="paymentRules" ref="paymentForm">
-            <el-form-item  label="Payment" prop="payment" :label-width="formLabelWidth">
-
-
-            <el-select v-model="form.payment" value-key="payment.key" placeholder="Select token" clearable>
-                <el-option v-for="(item,index) in payment.tokens" :key="index" :label="item.tokenSymbol+ '  '+ (item.tokenQuantity)/10**18" :value="index"></el-option>
+            <el-form-item label="Payment" prop="payment" :label-width="formLabelWidth">
+            <el-select v-model="form.payment" placeholder="Select token">
+                <el-option v-for="(item,index) in payment.tokens" :key="index" :label="index +' : $' +item.tokenSymbol+ '  '+ (item.tokenQuantity)/10**18" :value="index"></el-option>
             </el-select>
-
-
-
             </el-form-item>
 
             <el-form-item class="dialog-footer">
-                <el-button type="text" @click="backtoName()">Back</el-button>
-                <el-button type="primary" @click="buyNFT('paymentForm')">Make a wish</el-button>
+                <el-button type="primary" @click="buyNFT('wishForm')">Make a wish</el-button>
             </el-form-item>
 
         </el-form>
@@ -144,19 +102,19 @@
 
 <script>
 
-import getWeb3 from '../web3/web3';
+import getWeb3 from '../../web3/web3';
 
-import abi_collectible from '../web3/abi_collectible';
+import abi_collectible from '../../web3/abi_collectible';
 const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
 
 
 // Contract : Collectibles Paymnet
-import abi_payment from '../web3/abi_payment';
+import abi_payment from '../../web3/abi_payment';
 const contract_payment = '0xB98ACE202eEf57896263CfC89257A78a9C6B29cF';
 
 
 // Contract : ERC20 - $NEKO
-import abi_neko from '../web3/abi_neko';
+import abi_neko from '../../web3/abi_neko';
 const contract_neko = '0xdF3CF86Faed8a1936F3dB48a374E981e3fFC3164';
 
 export default {
@@ -167,13 +125,6 @@ export default {
         account: null,
         accountNekoBalance:0,
         poolBalance:0,
-        selected : 0,
-        display :{
-            isGuardian : true,
-            isName : false,
-            isWish : false,
-            isPayment : false,
-        },
         NFT : {
             owned:0,
             supply:0,
@@ -186,8 +137,11 @@ export default {
             ERC20:null
         },
         payment : {
-            tokens : [],
-            key : 0,
+            tokens :[],
+            count:0,
+            tokenAddress:null,
+            tokenSymbol:null,
+            tokenQuantity:null
         },
         dialog :{
             mint :false,
@@ -218,23 +172,15 @@ export default {
                     { required: true, message: 'Please make a wish', trigger: 'blur' },
                     { min: 5, max: 60, message: 'Message within 5 to 60 charaters', trigger: 'blur' }
                 ],
-        },    
-        nameRules: {
-                name: [
-                    { required: true, message: 'Give a name', trigger: 'blur' },
-                    { min: 1, max: 20, message: 'Message within 1 to 20 charaters', trigger: 'blur' }
+                guardian: [
+                    { required: true, message: 'required a guardian', trigger: 'change' }
                 ],
-        },  
-        paymentRules : {
                 payment: [
                     { required: true, message: 'select a payment token', trigger: 'change' }
                 ]
-        },          
+        },      
         formLabelWidth: '120px'
     };
-  },
-  created() {
-    this.payment.key = "1244";
   },
   mounted() {
       if (typeof web3 !== 'undefined') {
@@ -278,42 +224,6 @@ export default {
         }
   },
   methods:{
-    gotoGuardian () {
-            this.display.isGuardian = true;
-            this.display.isWish = false;
-    },
-    gotoWish () {
-        if (this.form.guardian!='guardian'){ 
-            this.display.isGuardian = false;
-            this.display.isWish = true;
-        } else {
-            this.dialog.gamma = true;
-        }
-    },
-    backtoWish () {
-        this.display.isName = false;
-        this.display.isWish = true;
-    },
-    gotoName (form) {
-        this.$refs[form].validate((valid) => {
-            if (valid) {
-                this.display.isWish = false;
-                this.display.isName = true;
-            }
-        })
-    },
-    backtoName () {
-        this.display.isPayment = false;
-        this.display.isName = true;
-    },
-    gotoPayment (form) {
-        this.$refs[form].validate((valid) => {
-            if (valid) {
-                this.display.isName = false;
-                this.display.isPayment = true;
-            }
-        })
-    },
     getGuardian (){
         this.newNFT.guardian = this.$route.params.guardian;
         this.form.guardian = this.newNFT.guardian;
@@ -374,10 +284,10 @@ export default {
         }
         return machineInput;
     },
-    buyNFT (form){
+    buyNFT (wishForm){
         if (this.form.guardian!='guardian'){
 
-            this.$refs[form].validate((valid) => {
+            this.$refs[wishForm].validate((valid) => {
             if (valid) {
                 
                 // select payment token  
@@ -411,12 +321,11 @@ export default {
 
         
     },
-    async generateNewNFT(_id, _transactionHash){
+    async generateNewNFT(_id){
 
         await this.contract.collectibles.methods.Nekos(_id).call({
         from: this.account
         }).then((res) => {
-            this.newNFT.transactionHash = _transactionHash;
             this.newNFT.id      = _id;
             this.newNFT.wish    = this.form.wish;
             this.newNFT.name    = this.form.name;
@@ -446,7 +355,7 @@ export default {
         from: this.account,
         value: this.payment.tokens[0].tokenQuantity
         }).then((res) => {
-            this.generateNewNFT(res.events.PAYMENT.returnValues._nftID, res.transactionHash );
+            this.generateNewNFT(res.events.PAYMENT.returnValues._nftID);
             console.log('pay with coin',res);
             console.log('New NFT ID : ',res.events.PAYMENT.returnValues._nftID);
             
@@ -472,8 +381,7 @@ export default {
         from: this.account,
         }).then((res) => {
             this.dialogMint = false;
-
-            this.generateNewNFT(res.events.PAYMENT.returnValues._nftID, res.transactionHash );
+            this.generateNewNFT(res.events.PAYMENT.returnValues._nftID);
             console.log('pay with ERC20 Token',res);
             console.log('New NFT ID : ',res.events.PAYMENT.returnValues._nftID);
         })
@@ -565,9 +473,6 @@ export default {
                 console.log(err, 'err');
             });
         }
-            this.payment.key = this.payment.tokens[0];
-            
-            console.log ('Payment Key ', this.payment.key);
             console.log ('Payment Tokens', this.payment.tokens);
         }).catch((err) => {
             console.log(err, 'err');

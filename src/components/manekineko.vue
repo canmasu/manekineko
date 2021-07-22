@@ -7,9 +7,12 @@
         <div> TOTAL Invited token : $NEKO {{totalLuckyCoinsByWallet}} </div>
 
 
-        <el-alert title="Loading ..." type="warning" show-icon v-if="isAlert"></el-alert>
+        <div class="chart"
+            v-loading="loading"
+            element-loading-text="Data loading ..."
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.2)" >
 
-        <div class="chart">
            <line-chart :chart-data="datacollection" :options="options"></line-chart>
         </div>    
         </el-card>
@@ -43,6 +46,7 @@ export default ({
     },
     data () {
         return {
+            loading : true,
             account:null,
             LuckyCoinsByWallet :[],
             amountByDay :[],
@@ -54,7 +58,6 @@ export default ({
             datacollection: null,      
             limit: [],
             options: null,
-            isAlert : false,
         }
     },
     created (){
@@ -135,16 +138,9 @@ export default ({
             maintainAspectRatio: false,
             };
 
-        // data loaded 
-        this.isAlert = false;
-
-
       },
 
         getLucyCoinsByWallet() {
-            // show data fetching status
-            this.isAlert = true;
-
 
             // event LUCKY_COINS (address indexed luckyWallet, uint256 indexed luckyNeko, uint256 amount, uint256 timestamp);
             this.contract.collectibles.getPastEvents('LUCKY_COINS', {
@@ -244,6 +240,8 @@ export default ({
 
             this.fillData();
 
+            //disable loading block
+            this.loading = false;
 
             }).catch((err) => {
                 console.log(err, 'err');

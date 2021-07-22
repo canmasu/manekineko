@@ -1,5 +1,6 @@
 <template>
     
+        <!-- Minting without check Gamma -->
     <div class="mint_container">
         <!-- Form -->
 
@@ -84,19 +85,19 @@
 
 <script>
 
-import getWeb3 from '../web3/web3';
+import getWeb3 from '../../web3/web3';
 
-import abi_collectible from '../web3/abi_collectible';
+import abi_collectible from '../../web3/abi_collectible';
 const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
 
 
 // Contract : Collectibles Paymnet
-import abi_payment from '../web3/abi_payment';
+import abi_payment from '../../web3/abi_payment';
 const contract_payment = '0xB98ACE202eEf57896263CfC89257A78a9C6B29cF';
 
 
 // Contract : ERC20 - $NEKO
-import abi_neko from '../web3/abi_neko';
+import abi_neko from '../../web3/abi_neko';
 const contract_neko = '0xdF3CF86Faed8a1936F3dB48a374E981e3fFC3164';
 
 export default {
