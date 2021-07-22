@@ -7,13 +7,68 @@
         <el-menu-item index="/tradehistory">Trade History</el-menu-item>
       </el-menu>
 
+
+
+    <el-row>
+      <el-col :span="8" v-for="(deal, index) in deals" :key="deal.DealID" :offset="index > 0 ? 0 : 0">
+        <el-card :body-style="{ padding: '0px' }">
+          <img :src="deal.url" class="image">
+          <div style="padding: 14px;">
+            <!-- 
+              Deal ID
+
+              Status
+              Seller
+              Price
+              Currency
+
+              TokenID
+              Name
+              Wish
+              Image
+              Valuation 
+              Last Price
+
+              Share, Buy
+            -->
+
+            <div>Deal id: {{deal.DealID}}</div>
+            <div>Seller : {{deal.Seller}}</div>
+            <div>Token id : {{deal.TokenID}}</div>
+            <div>Price : {{deal.Currency}} {{deal.Price}}</div>
+            <div>Neko Name : {{deal.name}}</div>
+            <div>Wish : {{deal.description}}</div>
+            <div>Valuation : {{deal.valuation}}</div>
+            <div>Gamma : {{deal.gamma}}</div>
+
+
+
+            <div class="bottom clearfix">
+
+              <el-button size="mini"> 
+                <router-link :to="'/token/' + deal.TokenID +'/0x0'"> View </router-link>
+              </el-button>
+
+              <el-button size="mini"> 
+                <router-link :to="'/token/' + deal.TokenID + '/' + account"> share </router-link>
+              </el-button>
+
+              <el-button size="mini" type="danger" 
+                @click="wantToBuy(
+                deal.DealID, 
+                deal.TokenID,
+                deal.Price,
+                deal.Currency)"> BUY 
+              </el-button>
+
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
     <el-card>
-      <div> Decenterlized NFT Trading 
-      NFTs Valuation 
-      Select NFT > Payment Method > Buy
-      Select NFT > Set a price > Sell
-      </div>
-    
+    <!--
     <el-table  :data="deals.filter(data => !search || data.TokenID.includes(search))" stripe style="width: 100%">
         <el-table-column prop="url" label="url">
             <template slot-scope="scope">
@@ -55,6 +110,9 @@
 
         </el-table-column>         
     </el-table>
+    -->
+
+    </el-card>
 
     <el-dialog title="Buy Neko Collectible" :visible.sync="dialog.buyNFT">
         <el-form :model="buyForm">
@@ -88,7 +146,6 @@
             <el-button type="primary" @click="paymentConfirm()"> Confirm </el-button>
         </div>
     </el-dialog>
-    </el-card>
     </div>
 </template>
 
@@ -238,17 +295,70 @@ getTotalDeals(){
               _currency = 'NEKO';
             }
             if (res[5]==true){
-              _status = 'active';
-              this.deals.push({
-                  DealID: i,
-                  Seller: res[0],
-                  Buyer: res[1],
-                  TokenID: res[2],
-                  Price: res[3],
-                  Currency : _currency,
-                  Status : _status,
-                  url: 'https://nft.neko.exchange/' + res[2] + '.svg',
-              });
+  
+
+              const axios = require('axios');
+              axios.get('https://metadata.neko.exchange/token/'+ res[2])
+              .then((metadata) => {
+                  console.log ('metadata :',metadata.data);
+        
+                  //make valuation
+                  
+                  let pow = metadata.data.attributes[3].value.toString().replace(',', '')
+
+                  //valuation return the decimal within 0 - 1
+                  //scarcity 0 - 100%
+                  var Power = pow/2;
+                  var Mean  = 250000;
+                  var Range = 250000;
+                  var BasePrice = 10.00;
+                  var valuation = 0;
+                  var scarcity = 0;
+
+                  if (Power>250000){
+                      // power above 250k
+                      valuation = (((Power-Mean)/100000)**5)/97.65625;
+                  } else {
+                      // power below 250k
+                      valuation = (((Range-Power)/100000)**5)/97.65625;
+                  }
+                  
+                  // x10
+                  if (valuation * 100 < 18.8 ){
+                      scarcity = 18.8 + valuation * 10;
+                  } else {
+                      scarcity = valuation * 100;
+                  }
+
+
+
+                // write Deal
+                _status = 'active';
+                this.deals.push({
+                    DealID: i,
+                    Seller: res[0],
+                    Buyer: res[1],
+                    TokenID: res[2],
+                    Price: res[3],
+                    Currency : _currency,
+                    Status : _status,
+                    url: metadata.data.image,
+
+                    name : metadata.data.name,
+                    description : metadata.data.description,
+                    image : metadata.data.image,
+                    gamma : metadata.data.gamma,
+                    valuation : parseFloat(BasePrice + valuation * 500).toFixed(4),
+                    scarcity : scarcity,
+                    
+                });
+  
+
+              }).catch((err) => {
+                  console.log(err, 'err');
+              });    
+
+
             }
         
           }).catch((err) => {
