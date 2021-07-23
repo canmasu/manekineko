@@ -72,7 +72,7 @@
             <el-form-item  label="Payment" prop="payment" :label-width="formLabelWidth">
 
 
-            <el-select v-model="form.payment" value-key="payment.key" placeholder="Select token" clearable>
+            <el-select v-model="form.payment" placeholder="Select token" clearable>
                 <el-option v-for="(item,index) in payment.tokens" :key="index" :label="item.tokenSymbol+ '  '+ (item.tokenQuantity)/10**18" :value="index"></el-option>
             </el-select>
 

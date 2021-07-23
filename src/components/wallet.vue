@@ -2,7 +2,9 @@
     <div>
 
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router>
-        <el-menu-item index="/receivedgift">Gifts</el-menu-item>
+        <el-menu-item index="/receivedgift">Asset</el-menu-item>
+        <el-menu-item index="/receivedgift">Maneki</el-menu-item>
+        <el-menu-item index="/receivedgift">Gift</el-menu-item>
         <el-menu-item index="/sentgift">Sent</el-menu-item>
       </el-menu>
 

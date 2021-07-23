@@ -12,6 +12,10 @@
     <el-row>
       <el-col :span="8" v-for="(deal, index) in deals" :key="deal.DealID" :offset="index > 0 ? 0 : 0">
         <el-card :body-style="{ padding: '0px' }">
+
+          <div>Neko Name : {{deal.name}}</div>
+          <div>Wish : {{deal.description}}</div>
+
           <img :src="deal.url" class="image">
           <div style="padding: 14px;">
             <!-- 
@@ -36,8 +40,6 @@
             <div>Seller : {{deal.Seller}}</div>
             <div>Token id : {{deal.TokenID}}</div>
             <div>Price : {{deal.Currency}} {{deal.Price}}</div>
-            <div>Neko Name : {{deal.name}}</div>
-            <div>Wish : {{deal.description}}</div>
             <div>Valuation : {{deal.valuation}}</div>
             <div>Gamma : {{deal.gamma}}</div>
 
@@ -311,7 +313,7 @@ getTotalDeals(){
                   var Power = pow/2;
                   var Mean  = 250000;
                   var Range = 250000;
-                  var BasePrice = 10.00;
+                  var BasePrice = 1.00;
                   var valuation = 0;
                   var scarcity = 0;
 
@@ -348,7 +350,7 @@ getTotalDeals(){
                     description : metadata.data.description,
                     image : metadata.data.image,
                     gamma : metadata.data.gamma,
-                    valuation : parseFloat(BasePrice + valuation * 500).toFixed(4),
+                    valuation : 'BUSD ' + parseFloat(BasePrice + valuation * 500).toFixed(4),
                     scarcity : scarcity,
                     
                 });

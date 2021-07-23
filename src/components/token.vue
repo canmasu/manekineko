@@ -37,6 +37,13 @@
             <el-link :href=NFT.txURL target="_blank" class="linkVerify" type="primary">Varify Certificate</el-link>
         </el-card>
 
+
+        
+        <!-- Provenance -->
+        <el-card  style="width: 40%; height:1000px;">
+            <div> Provenance </div>
+        </el-card>
+
         <!-- Chart -->
         <el-card  style="width: 40%">
             <radar-chart :chart-data="chartData" :options="options"></radar-chart>
