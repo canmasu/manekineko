@@ -9,46 +9,39 @@
     <el-container>
         <el-aside :width="isCollapse===true ?'0':'200px'">
             <el-menu :collapse="isCollapse" :collapse-transition="false" router>
+
+                <!--
                 <el-menu-item index="/welcome">
                     <i class="iconfont icon-home"></i>
                     <span slot="title">Home</span>
                 </el-menu-item>
+                -->
 
-                <el-menu-item index="/trade">
+                <el-menu-item index="/marketplace">
                     <i class="iconfont icon-exchange"></i>
-                    <span slot="title">Trade</span>
+                    <span slot="title">Marketplace</span>
                 </el-menu-item>
 
                 <el-menu-item index="/wish/guardian">
                     <i class="iconfont icon-dollar"></i>
-                    <span slot="title">Make a wish</span>
-                </el-menu-item>
-
-                <el-menu-item index="/wallet">
-                    <i class="iconfont icon-iconwallet"></i>
-                    <span slot="title">Wallet</span>
-                </el-menu-item>
-
-                <el-menu-item index="/manekineko">
-                    <i class="iconfont icon-dollar"></i>
-                    <span slot="title">Maneki</span>
-                </el-menu-item>
-
-                <el-menu-item index="/clubhouse">
-                    <i class="iconfont icon-dollar"></i>
-                    <span slot="title">Clubhouse</span>
+                    <span slot="title">Wish</span>
                 </el-menu-item>
 
 
-                <el-menu-item index="/launchpad">
-                    <i class="iconfont icon-launch"></i>
-                    <span slot="title">Launchpad</span>
-                </el-menu-item>
+                <el-submenu index="/wallet">
+                    <template slot="title">
+                        <i class="iconfont icon-iconwallet"></i>
+                        <span slot="title">wallet</span>
+                    </template>
+                        <el-menu-item-group>
+                            <el-menu-item index="/wallet">Asset</el-menu-item>
+                            <el-menu-item index="/earning">Earning</el-menu-item>
+                            <el-menu-item index="/clubhouse">Clubhouse</el-menu-item>
+                        </el-menu-item-group>
+                </el-submenu>
 
-                <el-menu-item index="/analytics">
-                    <i class="iconfont icon-graph_rise"></i>
-                    <span slot="title">Analytics</span>
-                </el-menu-item>
+
+<!--
 
                 <el-submenu index="/contact">
                     <template slot="title">
@@ -62,6 +55,7 @@
                             <el-menu-item index="1-4">Github</el-menu-item>
                         </el-menu-item-group>
                 </el-submenu>
+-->
 
             </el-menu>
         </el-aside>

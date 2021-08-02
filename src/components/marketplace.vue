@@ -10,7 +10,7 @@
 
 
     <el-row>
-      <el-col :span="8" v-for="(deal, index) in deals" :key="deal.DealID" :offset="index > 0 ? 0 : 0">
+      <el-col :span="6" v-for="(deal, index) in deals" :key="deal.DealID" :offset="index > 0 ? 0 : 0">
         <el-card :body-style="{ padding: '0px' }">
 
           <div>Neko Name : {{deal.name}}</div>
@@ -48,7 +48,7 @@
             <div class="bottom clearfix">
 
               <el-button size="mini"> 
-                <router-link :to="'/token/' + deal.TokenID +'/0x0'"> View </router-link>
+                <router-link :to="'/sale/' + deal.TokenID "> View </router-link>
               </el-button>
 
               <el-button size="mini"> 
@@ -305,7 +305,6 @@ getTotalDeals(){
                   console.log ('metadata :',metadata.data);
         
                   //make valuation
-                  
                   let pow = metadata.data.attributes[3].value.toString().replace(',', '')
 
                   //valuation return the decimal within 0 - 1

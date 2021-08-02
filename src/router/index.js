@@ -4,12 +4,13 @@ import Login from '../components/login.vue'
 import Home from '../components/home.vue'
 import Welcome from '../components/welcome.vue'
 import Wallet from '../components/wallet.vue'
-import Trade from '../components/trade.vue'
+import Marketplace from '../components/marketplace.vue'
 import Launchpad from '../components/launchpad.vue'
-import Manekineko from '../components/manekineko.vue'
+import Earning from '../components/earning.vue'
 import Analytics from '../components/analytics.vue'
 import Contact from '../components/contact.vue'
 import Token from '../components/token.vue'
+import Sale from '../components/sale.vue'
 import Wish from '../components/wish.vue'
 import Clubhouse from '../components/clubhouse.vue'
 import OpenDeal from '../components/opendeal.vue'
@@ -19,29 +20,31 @@ import ReceivedGift from '../components/receivedgift.vue'
 import SentGift from '../components/sentgift.vue'
 
 
+
 Vue.use(VueRouter)
 
 const routes = [
   {path: '/', redirect:'/home'},
   {path: '/login', component:Login },
   {path: '/home', component:Home,
-    redirect :'/welcome', 
+    redirect :'/marketplace', 
     children : [
       {path: '/welcome', component:Welcome },
       {path: '/wallet', component:Wallet },
       {path: '/receivedgift', component:ReceivedGift },
       {path: '/sentgift', component:SentGift },
-      {path: '/trade', component:Trade },
+      {path: '/marketplace', component:Marketplace },
       {path: '/opendeal', component:OpenDeal },
       {path: '/approveddeal', component:ApprovedDeal },
       {path: '/tradehistory', component:TradeHistory },
       {path: '/launchpad', component:Launchpad },
-      {path: '/manekineko', component:Manekineko },
+      {path: '/earning', component:Earning },
       {path: '/clubhouse', component:Clubhouse },
       {path: '/wish/:guardian', component:Wish },
       {path: '/analytics', component:Analytics },
       {path: '/contact', component:Contact },
-      {path: '/token/:id/:ref', component:Token }
+      {path: '/token/:id/:ref', component:Token },
+      {path: '/sale/:id/', component:Sale }
     ]
   }
   

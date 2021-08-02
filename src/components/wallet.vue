@@ -9,8 +9,11 @@
       </el-menu>
 
     <el-card>
-        <div> My Walllet address : {{account}}</div>
-        <div> BALANCE </div> 
+        <div> Estimated Value </div>
+        <div> {{account}}</div>
+        <div> Asset : {{ this.NFTs.length }} </div>
+        <div> Value</div>
+        <div> BNB {{ this.valautionBNB }} ≈$ {{ this.valautionBUSD }}</div>
 
     <el-table :data="coinBalance" stripe style="width: 100%">
         <el-table-column prop="label" label="Coin"> </el-table-column>
@@ -19,10 +22,64 @@
 
     </el-table>
 
+   <el-row>
+      <el-col :span="6" v-for="(item, index) in NFTs" :key="item.id" :offset="index > 0 ? 0 : 0">
+        <el-card :body-style="{ padding: '0px' }">
 
+          <div>Neko Name : {{item.name}}</div>
+          <div>Wish : {{item.description}}</div>
+
+          <img :src="item.url" class="image">
+          <div style="padding: 14px;">
+            <!-- 
+              Deal ID
+
+              Status
+              Seller
+              Price
+              Currency
+
+              TokenID
+              Name
+              Wish
+              Image
+              Valuation 
+              Last Price
+
+              Share, Buy
+            -->
+            <div>Token id : {{item.id}}</div>
+            <div>Valuation : BNB {{ parseFloat(item.BNB).toFixed(4) }}</div>
+            <div>           BUSD {{ item.BUSD }}</div>
+            <div>Gamma : {{item.gamma}}</div>
+
+
+
+            <div class="bottom clearfix">
+
+              <el-button size="mini"> 
+                <router-link :to="'/token/' + item.id +'/0x0'"> Share </router-link>
+              </el-button>
+              <el-button size="mini"> 
+                <router-link :to="'/token/' + item.id +'/0x0'"> View </router-link>
+              </el-button>
+
+              <el-button size="mini"> 
+                <router-link :to="'/wish/' + item.id "> Wish </router-link>
+              </el-button>
+
+              <el-button size="mini" @click="sendGift(item.id)">Gift</el-button>
+              <el-button size="mini" @click="wantToSell(item.id)">Sell</el-button>
+
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+<!--
     <el-table  
         v-loading="loading"
-        element-loading-text="拼命加载中"
+        element-loading-text="Loading ..."
         element-loading-spinner="el-icon-loading"
         element-loading-background="rgba(0, 0, 0, 0.8)"
         :data="NFTs.filter(data => !search || data.id.toLowerCase().includes(search.toLowerCase()))" stripe style="width: 100%">
@@ -62,7 +119,7 @@
         </el-table-column>   
              
     </el-table>
-
+-->
 
     <el-dialog title="Send as gift" :visible.sync="dialog.sendGift">
         <el-form :model="giftForm">
@@ -157,6 +214,8 @@ export default {
             tokenSupply:0,
             name:null,
             loading : true,
+            valautionBNB : 0,
+            valautionBUSD : 0,
 
             // NFT 
             NFT : {
@@ -214,7 +273,6 @@ export default {
                 //get current signed wallet address
                 this.web3.eth.getAccounts().then((accounts) => {
                     this.account = accounts[0];
-                    this.getNFTOwned();
 
                     //get BNB balance
                     this.web3.eth.getBalance(this.account).then((res) => {
@@ -235,6 +293,9 @@ export default {
                                 this.getNekoBalance();
                                 this.getCakeBalance();
                                 this.getBakeBalance();
+
+                                // Get All Owned NFTs 
+                                this.getNFTOwned();
 
                             }).catch((err) => {
                                 console.log(err, 'err');
@@ -324,14 +385,51 @@ export default {
             this.contract.collectibles.methods.ownedNekos().call({
                 from: this.account,
             }).then((res) => {
-
+            
 
             for (let i = 0; i < res.length; i += 1) {
                 // retrive NFT Details
-                this.contract.collectibles.methods.Nekos(res[i]).call({
-                    from: this.account,
-                }).then((Neko) => {
-                    var generation = parseInt(Neko[1].substr(32, 6));
+                const axios = require('axios');
+                axios.get('https://metadata.neko.exchange/token/'+ res[i])
+                .then((metadata) => {
+
+                  //make valuation
+                  let pow = metadata.data.attributes[3].value.toString().replace(',', '')
+
+                  //valuation return the decimal within 0 - 1
+                  //scarcity 0 - 100%
+                  var Power = pow/2;
+                  var Mean  = 250000;
+                  var Range = 250000;
+                  var BasePrice = 0.0025;
+                  var VFactor = 0;      // valuation Factor
+                  var valuation = 0;
+                  var scarcity = 0;
+                  var PFactor  = 5;     // price Factor 
+
+                  if (Power>250000){
+                      // power above 250k
+                      VFactor = (((Power-Mean)/100000)**5)/97.65625;
+                  } else {
+                      // power below 250k
+                      VFactor = (((Range-Power)/100000)**5)/97.65625;
+                  }
+                  
+                  valuation = VFactor * PFactor;
+
+                  // x10
+                  if (valuation * 100 < 18.8 ){
+                      scarcity = 18.8 + VFactor * 10;
+                  } else {
+                      scarcity = VFactor * 100;
+                  }
+
+                  this.valautionBNB += BasePrice + valuation;
+
+                  this.valautionBUSD += (BasePrice + valuation)*this.coinBalance[0].price;
+
+
+                    var generation = parseInt(metadata.data.attributes[0].value);
                     var gen_Display = 0;
 
                     if (generation<6){
@@ -344,18 +442,30 @@ export default {
                         gen_Display = generation;
                     }
 
+
                     this.NFTs.push({
                         id: res[i],
-                        power: Neko[0],
-                        DNA: Neko[1],
-                        url: 'https://nft.neko.exchange/' + res[i] + '.svg',
+                        power: metadata.data.attributes[3].value,
+                        DNA: metadata.data.art_dna,
+                        url: metadata.data.image,
                         gen : gen_Display,
+                        
+                        name : metadata.data.name,
+                        description : metadata.data.description,
+                        image : metadata.data.image,
+                        gamma : metadata.data.gamma,
+                        BNB : BasePrice + valuation,
+                        BUSD : (BasePrice + valuation)*this.coinBalance[0].price,
+                        scarcity : scarcity,
                     });
 
                 }).catch((err) => {
                     console.log(err, 'err');
                 });
             }
+
+
+
             this.loading = false;
 
             }).catch((err) => {
