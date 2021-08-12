@@ -6,7 +6,7 @@ import Welcome from '../components/welcome.vue'
 import Wallet from '../components/wallet.vue'
 import Marketplace from '../components/marketplace.vue'
 import Launchpad from '../components/launchpad.vue'
-import Earning from '../components/earning.vue'
+import Earn from '../components/earn.vue'
 import Analytics from '../components/analytics.vue'
 import Contact from '../components/contact.vue'
 import Token from '../components/token.vue'
@@ -38,7 +38,7 @@ const routes = [
       {path: '/approveddeal', component:ApprovedDeal },
       {path: '/tradehistory', component:TradeHistory },
       {path: '/launchpad', component:Launchpad },
-      {path: '/earning', component:Earning },
+      {path: '/earn', component:Earn },
       {path: '/clubhouse', component:Clubhouse },
       {path: '/wish/:guardian', component:Wish },
       {path: '/analytics', component:Analytics },

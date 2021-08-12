@@ -35,7 +35,7 @@
                     </template>
                         <el-menu-item-group>
                             <el-menu-item index="/wallet">Asset</el-menu-item>
-                            <el-menu-item index="/earning">Earning</el-menu-item>
+                            <el-menu-item index="/earn">Earn</el-menu-item>
                             <el-menu-item index="/clubhouse">Clubhouse</el-menu-item>
                         </el-menu-item-group>
                 </el-submenu>

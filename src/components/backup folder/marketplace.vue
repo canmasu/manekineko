@@ -1,100 +1,13 @@
 <template>
     <div class="sales_container">
-    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router>
-      <el-menu-item index="/opendeal">Open deal</el-menu-item>
-      <el-menu-item index="/approveddeal">Approved deal</el-menu-item>
-      <el-menu-item index="/tradehistory">Trade History</el-menu-item>
-    </el-menu>
 
-    <el-row>
-      <el-card>
-      <el-col :span="8">
-        <div class="grid-content bg-purple">TOTAL SALE <br> 123,345</div>
-      </el-col>
-      <el-col :span="8">
-        <div class="grid-content bg-purple">TOTAL VOLUME <br> BNB 2,293,123,345</div>
-      </el-col>
-      <el-col :span="8">
-        <div class="grid-content bg-purple">COLLECTIBLE SOLD <br> 123,345</div>
-      </el-col>
-      </el-card>
-    </el-row>
-
-    <el-row>
-      <h2> Top </h2>
-    </el-row>
-
-    <el-row>
-      <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://nft.neko.exchange/49.svg" />
-        <div> SOLD BNB 212 </div>
-        <div> ROI 1288% </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://nft.neko.exchange/49.svg" />
-        <div> SOLD BNB 212 </div>
-        <div> ROI 1288% </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://nft.neko.exchange/49.svg" />
-        <div> SOLD BNB 212 </div>
-        <div> ROI 1288% </div>
-        </el-card>
-      </el-col>
-      <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://nft.neko.exchange/49.svg" />
-        <div> SOLD BNB 212 </div>
-        <div> ROI 1288% </div>
-        </el-card>
-      </el-col>
-    </el-row>
+      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router>
+        <el-menu-item index="/opendeal">Open deal</el-menu-item>
+        <el-menu-item index="/approveddeal">Approved deal</el-menu-item>
+        <el-menu-item index="/tradehistory">Trade History</el-menu-item>
+      </el-menu>
 
 
-    <el-row>
-      <el-col :span="12">
-        <el-card>
-        <div class="grid-content bg-purple"><h2> Recently Listed </h2></div>
-        <el-row v-for="(deal, index) in deals" :key="deal.DealID" :offset="index > 0 ? 0 : 0">
-          <el-row>
-            <el-col :span="5">{{deal.name}}</el-col>
-            <el-col :span="19">{{deal.description}}</el-col>
-          </el-row>
-          <el-row>
-          <el-col :span="3"><img :src="deal.url" class="image"></el-col>
-          <el-col :span="3"><div class="grid-content"> {{deal.TokenID}} <br> ref 1</div></el-col>
-          <el-col :span="3"><div class="grid-content">世代 <br>{{deal.generation}}</div></el-col>
-          <el-col :span="3"><div class="grid-content">元気</div></el-col>
-          <el-col :span="3"><div class="grid-content">Gamma <br> {{deal.gamma}}</div></el-col>
-          <el-col :span="4"><div class="grid-content">Valuation <br> {{deal.valuation}}</div></el-col>
-          <el-col :span="5"><div class="grid-content">{{deal.Currency}} {{deal.Price}}</div></el-col>
-          </el-row>
-        </el-row>
-        </el-card>
-      </el-col>
-
-
-      <el-col :span="12">
-
-        <el-card>
-        <div class="grid-content bg-purple-light"><h2> Recent Sold </h2> </div>
-        <el-row v-for="(deal, index) in deals" :key="deal.DealID" :offset="index > 0 ? 0 : 0">
-          <el-col :span="3"><img :src="deal.url" class="image"></el-col>
-          <el-col :span="3"><div class="grid-content"> {{deal.TokenID}} <br> ref 1</div></el-col>
-          <el-col :span="3"><div class="grid-content">世代 <br>100</div></el-col>
-          <el-col :span="3"><div class="grid-content">元気</div></el-col>
-          <el-col :span="3"><div class="grid-content">Gamma <br> {{deal.gamma}}</div></el-col>
-          <el-col :span="4"><div class="grid-content">Valuation <br> {{deal.valuation}}</div></el-col>
-          <el-col :span="5"><div class="grid-content">{{deal.Currency}} {{deal.Price}}</div></el-col>
-        </el-row>
-        </el-card>
-      </el-col>
-    </el-row>
 
     <el-row>
       <el-col :span="6" v-for="(deal, index) in deals" :key="deal.DealID" :offset="index > 0 ? 0 : 0">
@@ -122,7 +35,7 @@
 
               Share, Buy
             -->
-  
+
             <div>Deal id: {{deal.DealID}}</div>
             <div>Seller : {{deal.Seller}}</div>
             <div>Token id : {{deal.TokenID}}</div>
@@ -436,7 +349,6 @@ getTotalDeals(){
                     description : metadata.data.description,
                     image : metadata.data.image,
                     gamma : metadata.data.gamma,
-                    generation : metadata.data.attributes[0].value,
                     valuation : 'BUSD ' + parseFloat(BasePrice + valuation * 500).toFixed(4),
                     scarcity : scarcity,
                     

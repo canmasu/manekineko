@@ -57,7 +57,27 @@ $power    = $_POST['power'];
         *  --> 61P  > 66P
         */
 
-$NFT -> ArtPiece    = (int)substr($energies, 1,1);      // 1D = ARTPIECE
+
+/* 
+    FibonacciRange
+     - DNA ( 27P to 33P, 6 Digits) % FibonacciLimit
+    
+    FibonacciRange
+*/
+$fibonacciRange = array(0, 1, 2, 4, 7, 12, 20, 33, 54, 88, 143);
+$fibonacciLimit = 143;
+$ArtPieces      = 10;
+$term           = 9;
+$point = (int)substr($energies, 1,3) % $fibonacciLimit;
+
+for ( $i=0; $i< count($fibonacciRange); $i++ ){
+    if( $point >= $fibonacciRange[$i] && $point < $fibonacciRange[$i+1]) {
+        $term = $i; 
+    }
+}
+
+
+$NFT -> ArtPiece    = $term;                            // 1D = ARTPIECE
 $NFT -> isPainting  = (int)substr($energies, 9,4);      // 1D = isPAINTING
 $NFT -> Painting    = (int)substr($energies, 7,1);      // 1D = PAINTING
 $NFT -> Bgcolour    = (int)substr($energies, 59,1);     // 1D = PAINTING
