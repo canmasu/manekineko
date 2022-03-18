@@ -1,329 +1,143 @@
 <template>
-<el-row>
-    <el-row>
-        <el-col :span="24">
-            <h2> Last transcated </h2>
-        </el-col>
-    </el-row>
-    <el-row>
-        <el-col :span="8">
-            <el-card shadow="always">
-                <div> 
-                    <img src="https://harvestcamasu.com/cryptoArtist/neko/217.svg" class="image"> 
-                    NEKO / NC  1,000,000 &#8776; $12 </div>
-            </el-card>
-        </el-col>
-        <el-col :span="8">
-            <el-card shadow="always">
-                <div> 
-                    <img src="https://harvestcamasu.com/cryptoArtist/neko/345.svg" class="image"> 
-                    BNB / NC  7.2  &#8776; $2,810 </div>
-            </el-card>
-        </el-col>
-        <el-col :span="8">
-            <el-card shadow="always">
-                <div>
-                    <img src="https://harvestcamasu.com/cryptoArtist/neko/74.svg" class="image">  
-                    CAKE / NC  32  &#8776; $14 </div>
-            </el-card>
-        </el-col>
-    </el-row>
 
 
-    <el-row>
-        <el-col :span="24">
-            <el-carousel :interval="5000" arrow="always">
-                <el-carousel-item v-for="item in 4" :key="item">
-                <h3>{{ item }}</h3>
-                </el-carousel-item>
-            </el-carousel>
-        </el-col>
-    </el-row>
-    
-    <el-row>
-        <el-col :span="24">
-            <h2> Sale </h2>
-        </el-col>
-    </el-row>
 
-    <el-row>
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/327.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 327 第 97 世代</span>
-            <div class="bottom clearfix">
-            <el-tag
-                    v-for="item in items"
-                    :key="item.label"
-                    :type="item.type"
-                    effect="plain">
-                    {{ item.label }}
-            </el-tag>
-
-            <div class="price">$NEKO 9,898,283</div>
-            <el-progress :percentage="18"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
+    <div class="mint_container">
+        <div class="sticky-note">
+            <div class="sticky-note-text">
+            Full experience available for
+            <img src="../../src/assets/images/logo-win.png" />
+            <img src="../../src/assets/images/logo-mac.png" />
+            <br>
+            <span style="color:#666;">
+            Make a wish &amp; Marketplace only supported on PC / MacOS
+            </span>
             </div>
         </div>
-        </el-card>
-    </el-col>
+        <img class="maneki-logo" src="../../src/assets/images/logo-maneki_logo.png"/>
 
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/681.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 681 第 97 世代</span>
-            <div class="bottom clearfix">
-            <div class="price">$CAKE 120.20 </div>
-            <el-progress :percentage="38"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
-            </div>
-        </div>
-        </el-card>
-    </el-col>
 
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/677.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 677 第 97 世代</span>
-            <div class="bottom clearfix">
-            <div class="price">$BNB 1.2</div>
-            <el-progress :percentage="68"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
-            </div>
-        </div>
-        </el-card>
-    </el-col>
+        <div  v-if="!isDesktop" style=" border:0px solid red; color:white; text-align: center; width:100%; margin:0 auto; margin-top:45px;">
 
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/637.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 637 第 97 世代</span>
-            <div class="bottom clearfix">
-            <div class="price">$NEKO 10,000,000</div>
-            <el-progress :percentage="86"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
+            <div style="border:0px solid green; text-align:center; padding-top:50px;">
+            <div style="padding:20px 0; ">Explore latest minted wishes </div><br>
+            <router-link :to="'/wishingWall'">
+                <el-button> Take a tour </el-button>
+            </router-link>
             </div>
         </div>
-        </el-card>
-    </el-col>
-    </el-row>
-    <el-row>
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/27.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 27 第 97 世代</span>
-            <div class="bottom clearfix">
-            <div class="price">$NEKO 9,898,283</div>
-            <el-progress :percentage="55"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
-            </div>
-        </div>
-        </el-card>
-    </el-col>
 
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/81.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 81 第 97 世代</span>
-            <div class="bottom clearfix">
-            <div class="price">$CAKE 120.20 </div>
-            <el-progress :percentage="45"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
-            </div>
-        </div>
-        </el-card>
-    </el-col>
 
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/617.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 617 第 97 世代</span>
-            <div class="bottom clearfix">
-            <div class="price">$BNB 1.2</div>
-            <el-progress :percentage="43"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
+        <div  v-if="isDesktop" style=" color:#262626; text-align: center; width:820px; margin:0 auto; margin-top:50px;">
+            <div style=" background:#ffe000; padding:30px; border:2px solid red; width:300px; height:380px;float:left; margin-right:90px; border-radius:20px;">
+                <div style="font-size:1.3em;padding:5px; font-weight:300;"> Collect using your wallet </div>
+                <img src="../../src/assets/images/connect-cp.png" />
+                <div style="font-weight:300; padding:5px; padding-bottom:10px;"> Connect your wallet to fully enjoy Maneki-Meow! </div>
+                <el-button style="background:#ff4200;border:1px solid #ff4200; color:white;"  v-on:click="connectWallet()"> Continue with wallet </el-button>
             </div>
-        </div>
-        </el-card>
-    </el-col>
 
-    <el-col :span="6">
-        <el-card :body-style="{ padding: '0px' }">
-        <img src="https://harvestcamasu.com/cryptoArtist/neko/537.svg" class="image">
-        <el-divider></el-divider>
-        <div style="padding: 14px;">
-            <span>招き猫 # 537 第 97 世代</span>
-            <div class="bottom clearfix">
-            <div class="price">$NEKO 10,000,000</div>
-            <el-progress :percentage="57"></el-progress>
-            <el-button type="text" class="button">Buy</el-button>
+            <router-link :to="'/wishingWall'">
+            <div style=" background:#f7f7f7; padding:30px; border:1px solid white; width:300px; height:380px;float:left; border-radius:20px;">
+                <div style="font-size:1.3em;padding:5px; font-weight:300;"> Explore as guest</div>
+                <img src="../../src/assets/images/connect-ncp.png" />
+                <div style="font-weight:300; padding:5px; padding-bottom:10px;"> Your information will be locally stored and your experience limited</div>
             </div>
+            </router-link>
+
+
         </div>
-        </el-card>
-    </el-col>
-    </el-row>
-</el-row>
+    </div>
 </template>
 
 <script>
 
-import NekoABI from '../web3/abi_neko';
-const contractAddress = '0xdF3CF86Faed8a1936F3dB48a374E981e3fFC3164';
+const { Conflux} = require('js-conflux-sdk');
+const conflux = new Conflux({
+    url: "https://test.confluxrpc.com",
+    networkId: 1,
+});
 
-const Web3 = require('web3');
-const web3 = new Web3('https://data-seed-prebsc-1-s1.binance.org:8545');
-const contract = new web3.eth.Contract(NekoABI,contractAddress);
+
+import ConfluxPortalOnboarding from 'conflux-portal-onboarding'
+
+conflux.provider = window.conflux;
+
+const forwarderOrigin = 'https://portal.confluxnetwork.org/'
+const onboarding = new ConfluxPortalOnboarding({ forwarderOrigin })
+
 
 export default {
   data() {
     return {
-        account :null,
-        contractInstance:null,
-        balance :0,
-        currentDate: new Date(),
-        items: [
-            { type: '', label: 'Si Putih' },
-            { type: '', label: 'Money money come' }
-        ]
+        isDesktop:true
+
     };
   },
   mounted() {
-    // check metamask and request for installation
-    if(typeof window.ethereum !== 'undefined'){
-        console.log('Metamask is installed!');
-        this.getAccount();
-        this.connectBlockchain();
-    } else {
-        console.log('Please Install Metamask');
-    }
+        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+            // true for mobile device
+            console.log("Mode : mobile");
+            this.isDesktop = false;
+
+        }else{
+            // false for not mobile device
+            console.log("Mode : Desktop MAC");
+        }
   },
   methods : {
-    async getAccount(){
-        await window.ethereum.request({method: 'eth_requestAccounts'}).then((res) => {
-            const accounts = res;
-            this.account = accounts[0];
-            console.log('inner asyn ',this.account);
-        }).catch((err) => {
-            console.log(err, 'err');
-        });
+      connectWallet(){
 
-        await window.ethereum.request({
-            method: 'eth_getBalance',
-            params: [this.account,"latest"],
-        }).then((res) => {
-            this.balance = parseInt(res)/10**18;
-            console.log('inner balance ',this.balance);
-        }).catch((err) => {
-            console.log(err, 'err');
-        });
-    }, 
-    async connectBlockchain (){
-        //test a Return value
-
-        await window.ethereum.request({method: 'eth_requestAccounts'}).then((res) => {
-            const accounts = res;
-            this.account = accounts[0];
-
-            console.log('wallet addrs :', this.account);
-            contract.methods.balanceOf(this.account).call().then((res) => {
-                console.log('async You $neko Bal :', res);
-            }).catch((err) => {
-                console.log(err, 'err');
-            });
-
-        }).catch((err) => {
-            console.log(err, 'err');
-        });
-
-
-
-    }
-
+            if (!ConfluxPortalOnboarding.isConfluxPortalInstalled()) {
+                onboarding.startOnboarding()
+                console.log ('Click here to install ConfluxPortal!')
+                window.location.href = 'https://chrome.google.com/webstore/detail/confluxportal/bjiiiblnpkonoiegdlifcciokocjbhkd?hl=en-GB';
+                
+            } else if (this.accounts && this.accounts.length > 0) {
+                console.log('Connected :', this.accounts)
+            } else {
+                console.log('Connect')
+                window.conflux.enable()
+                this.$router.push({path:'/wishingWall'})
+            }
+          
+      }
   }
 }
 </script>
 
 <style>
-  .el-carousel__item h3 {
-    color: #475669;
-    font-size: 18px;
-    opacity: 0.75;
-    line-height: 300px;
-    margin: 0;
-  }
-  
-  .el-carousel__item:nth-child(2n) {
-    background-color: #99a9bf;
-  }
-  
-  .el-carousel__item:nth-child(2n+1) {
-    background-color: #d3dce6;
-  }
-  .el-row {
-    margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  .el-col {
-    border-radius: 4px;
-  }
-  .grid-content {
-    border-radius: 4px;
-    min-height: 36px;
-  }
-  .row-bg {
-    padding: 10px 0;
-    background-color: #f9fafc;
-  }
-  .el-card {
-      padding: 3px;
-      margin:3px;
-  }
-  .price {
-    margin-top: 13px;
-  }
-
-  .bottom {
-    margin-top: 13px;
-    line-height: 12px;
-  }
-
-  .button {
-    padding: 0;
-    float: right;
-  }
-
   .image {
     width: 100%;
     display: block;
   }
+    .sticky-note {
+        display: none;
+    }
 
-  .clearfix:before,
-  .clearfix:after {
-      display: table;
-      content: "";
-  }
-  
-  .clearfix:after {
-      clear: both
-  }
-  .el-tag {
-      padding: 3px;
-      margin:3px;
-  }
+
+@media only screen and (max-width: 768px) {
+  /* For mobile phones: */
+    .maneki-logo {
+        width:300px;
+        margin:0 auto;
+        
+    }
+    .sticky-note {
+        display:block;
+        width:100%;
+        background:#262626;
+        margin: 0;
+        margin-bottom: 30px;
+        border-radius:10px;
+    }
+    .sticky-note-text{
+        padding: 20px;
+    }
+    .sticky-note img {
+        height: 20px;
+        padding-left:3px;
+    }
+}
+
+
 </style>

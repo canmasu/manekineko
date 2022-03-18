@@ -1,4 +1,4 @@
-const NekoABI = [
+const abi_neko = [
 	{
 		"inputs": [
 			{
@@ -286,4 +286,4 @@ const NekoABI = [
 		"type": "function"
 	}
 ]
-export default NekoABI;
+export default abi_neko;

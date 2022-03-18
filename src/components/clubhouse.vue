@@ -3,7 +3,7 @@
         <h1> Clubhouse </h1>
         <el-card>
             <div>Members:</div>
-            <el-table :data="members" stripe style="width: 100%">
+            <el-table :data="members" stripe style="width: 100% " empty-text=" No data">
                     <el-table-column prop="address" label="Wallet Address" > </el-table-column>
                     <el-table-column prop="balance" label="Minted" > </el-table-column>   
             </el-table>

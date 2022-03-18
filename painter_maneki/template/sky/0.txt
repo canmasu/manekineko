@@ -1,0 +1,3 @@
+  <g id="sky">
+    <rect width="1500" height="1499.86" style="fill: #ffe600"/>
+  </g>

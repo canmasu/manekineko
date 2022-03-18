@@ -1,70 +1,37 @@
 <template>
     <el-container>
-    <el-header>
+            <el-header>
+                <el-menu  class="el-main-menu" mode="horizontal" router 
+                style="text-align:center; text-color=#fff  active-text-color=#ffd04b">
 
-        <div class="toggle-btn" @click="toggle"> X </div>
-        <h1>招き猫 Maneki-Neko</h1>
-        <el-button> connect wallet </el-button>
-    </el-header>
-    <el-container>
-        <el-aside :width="isCollapse===true ?'0':'200px'">
-            <el-menu :collapse="isCollapse" :collapse-transition="false" router>
+                    <el-menu-item class="nav-home" v-on:click="goHome()">Home</el-menu-item>
+                    <el-menu-item class="nav-wishes" index="/wishingWall">Wishes</el-menu-item>
+                    <el-menu-item class="nav-marketplace" index="/marketplace">Marketplace</el-menu-item>
+                    <el-menu-item class="nav-makeWish" index="/wish/guardian">Make a wish</el-menu-item>   
 
-                <!--
-                <el-menu-item index="/welcome">
-                    <i class="iconfont icon-home"></i>
-                    <span slot="title">Home</span>
-                </el-menu-item>
-                -->
-
-                <el-menu-item index="/marketplace">
-                    <i class="iconfont icon-exchange"></i>
-                    <span slot="title">Marketplace</span>
-                </el-menu-item>
-
-                <el-menu-item index="/wish/guardian">
-                    <i class="iconfont icon-dollar"></i>
-                    <span slot="title">Wish</span>
-                </el-menu-item>
-
-
-                <el-submenu index="/wallet">
+                </el-menu>
+                <el-menu  class="el-main-menu nav-wallet" mode="horizontal" router 
+                style=" float:right; text-align:center; text-color=#fff  active-text-color=#ffd04b">
+                    <el-submenu index="/wallet">
                     <template slot="title">
                         <i class="iconfont icon-iconwallet"></i>
                         <span slot="title">wallet</span>
                     </template>
                         <el-menu-item-group>
                             <el-menu-item index="/wallet">Asset</el-menu-item>
-                            <el-menu-item index="/earn">Earn</el-menu-item>
+                            <!-- <el-menu-item index="/earn">Earn</el-menu-item> -->
+                            <el-menu-item index="/sentgift">Gift</el-menu-item>
                             <el-menu-item index="/clubhouse">Clubhouse</el-menu-item>
+                            <!-- <el-menu-item index="/painter">Painter</el-menu-item> -->
                         </el-menu-item-group>
-                </el-submenu>
-
-
-<!--
-
-                <el-submenu index="/contact">
-                    <template slot="title">
-                        <i class="iconfont icon-contact"></i>
-                        <span slot="title">Contact</span>
-                    </template>
-                        <el-menu-item-group>
-                            <el-menu-item index="1-1">Telegram</el-menu-item>
-                            <el-menu-item index="1-2">Twitter</el-menu-item>
-                            <el-menu-item index="1-3">Medium</el-menu-item>
-                            <el-menu-item index="1-4">Github</el-menu-item>
-                        </el-menu-item-group>
-                </el-submenu>
--->
-
-            </el-menu>
-        </el-aside>
-
-
-        <el-main>
-            <router-view/>
-        </el-main>
-    </el-container>
+                    </el-submenu>
+                </el-menu>
+            </el-header>
+            <el-container>
+                <el-main>
+                    <router-view/>
+                </el-main>
+            </el-container>
     </el-container>
 </template>
 
@@ -73,13 +40,19 @@
 export default {
     data(){
         return{
-            isCollapse:false
+            isCollapse:true
         }
+    },
+    mounted(){
+
     },
 
     methods : {
         toggle(){
             this.isCollapse = !this.isCollapse;
+        },
+        goHome(){
+            window.location.href = 'https://maneki.market';
         }
     }
 }
@@ -87,17 +60,26 @@ export default {
 
 
 <style lang="less" scoped>
+
 .el-header {
-    background-color:gainsboro;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: left;
+    color: blanchedalmond;
+    border-bottom:solid 1px #0086ff;
+}
+.el-main-menu{
+    text-align: left;
+    background:none;
+}
+.el-menu.el-menu--horizontal{
+    border-bottom: none;
 }
 .el-aside {
-    background-color : #CCC;
 }
 .el-main {
-    background-color: #F7F7F7;
+    overflow:hide;
+    height: 100%;
 }
 .el-container {
     height: 100%;
@@ -105,9 +87,19 @@ export default {
 .iconfont {
     padding-right:15px;
 }
-.toggle-btn {
-    text-align: center;
-    line-height: 24px;
-    cursor: pointer;
+
+@media only screen and (max-width: 768px) {
+  /* For mobile phones: */
+    .nav-marketplace {
+        display: none;
+    }
+    .nav-makeWish {
+        display: none;
+
+    }
+    .nav-wallet {
+        display: none;
+    }
 }
+
 </style>

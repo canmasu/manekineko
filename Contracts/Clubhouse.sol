@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
-// BSC 0.V4.01
-// input number lucky NFT
-// Changed the Maneki Pool relatively to the Royalty distribution
+// DEPLOYMENT CODE : 22022022_CFX
+
 
 pragma solidity ^0.8.0;
 

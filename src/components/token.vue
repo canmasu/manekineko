@@ -1,7 +1,36 @@
+ <!-- Public Access Page : Guardian ID  -->
+
 <template>
-    <div>
-        <!-- Image -->
-        <el-card  style="width: 40%">
+    <div class="main-container">
+
+        <!-- Wallet connectd -->
+        <div v-if="display.isConnect" class="wallet-connection"  >
+            <div class="token-wrap">
+                <div class="cfx-balance">{{this.accountCFXBalance}} CFX</div>
+                <div class="neko-balance">{{this.accountNekoBalance}} NEKO</div>
+                <div class="meow-balance">{{this.accountMeowBalance}}</div>
+                <div  style="float:left;font-size:0.6em; color:#666;"> Conflux Network : {{shortenAccount}} </div>
+            </div>
+        </div>
+
+
+        <!-- Wallet not connected -->
+        <div v-if="!display.isConnect" class="wallet-connection"  >
+            <div class="token-wrap">
+                <div class="cfx-balance"> Conflux networks</div>
+                <el-button 
+                    style="font-size:1.2em; margin-top:-5px; background-color:#ffe000; color:#ff3600; border:1px solid #ff3600;" 
+                    @click="updateButton()" v-if="!display.isConnect"> Connect wallet
+                </el-button>
+            </div>
+        </div>
+
+
+
+        <img src="../../src/assets/images/logo-maneki_logo.png" />
+
+        <div class="sub-container-gaurdian-details">
+        <el-card  style="width: 440px">
             <el-image :src="NFT.image" class="nft-image">
                 <div slot="placeholder" class="image-slot">
                     loading<span class="dot">...</span>
@@ -13,87 +42,310 @@
         </el-card> 
 
 
-        <!-- valuation -->
-        <el-card  style="width: 40%">
-            <el-table  :data="valuation" stripe>
-                <el-table-column prop="trait_type" label="VAULATION" width="250"> </el-table-column>
-                <el-table-column prop="value"  width="250"> </el-table-column>      
-            </el-table>
 
-            <el-button size="mini" @click="sendGift(scope.row.id)">Gift</el-button>
-            <el-button size="mini" @click="wantToSell(scope.row.id)">Sell</el-button>
-            <router-link :to="'/wish/' + $route.params.id">
-                <el-button size="mini" type="primary" >Wish</el-button>
+        <!-- General details  -->
+        <el-card  style="width: 500px; height:65px; background:none; margin-bottom:5px;">
+            <div v-if="NFT.name" >
+                <div class="el-card-name">{{NFT.name}} , 
+                    <span v-if="NFT.refCount" style="color:#0375fc;">
+                        {{5 - NFT.refCount}} blessing left
+                    </span>
+                    <br> 
+                    <span style="color:#0375fc;">MEOW 猫 <span style="font-weight:bold">#{{NFT.id}}</span></span> 
+                    <span v-if="NFT.gamma" style="color:#BBB;">
+                        &#x2B05; Super Guardian MEOW 猫 #{{NFT.gamma}}
+                    </span>
+                     
+                </div>
+            </div>
+        </el-card>
+
+        <el-card  style="width: 500px; height:200px; background : #ffe600;">
+            <div v-if="NFT.description" >
+                <div class="el-card-wish">
+                    <div style="background:#00ba2c; height:80px; padding:10px; color:#3f3f3f; 
+    border-radius: 10px 10px 0 0;">{{NFT.description}}</div>
+                </div>
+            </div>
+            <div >
+                <div class="el-card-neko"> 
+                    <div style="background:#7ac943; height:40px; padding:10px; color:#3f3f3f; border-radius:0 0 10px 10px;">{{ NFT.piggyBank }} NEKO</div>
+                </div>
+            </div>
+        </el-card>
+
+
+
+        <!-- Action Button -->
+        <el-card  style="width: 500px; height:100px; ">
+            <router-link :to="'/wish/' + NFT.id "> 
+                <el-button > Guardian </el-button>
             </router-link>
+            &nbsp;
+            <el-button @click="sendGift(NFT.id)">Gift</el-button>
+            <el-button @click="openApproveSellDialog(NFT.id)">Sell</el-button>
         </el-card>
 
+  
+        <div style="clear:both;"></div>
 
-        <!-- Certificate -->
-        <el-card style="width: 82%">
-            <el-table  :data="certificate" stripe>
-                <el-table-column prop="trait_type" label="Birth Certificaiton" width="200"> </el-table-column>
-                <el-table-column prop="value" > </el-table-column>      
+
+        <!-- Maneki Power -->
+        <el-card  class="el-card-meta" style="width: 500px">
+            <el-table class="el-table-meta" :data="NFT.attributes" stripe>
+                <el-table-column prop="trait_type" label="MANEKI POWER" width="180"> </el-table-column>
+                <el-table-column prop="value" label="value #" > </el-table-column>      
             </el-table>
-            <el-link :href=NFT.txURL target="_blank" class="linkVerify" type="primary">Varify Certificate</el-link>
-        </el-card>
-
-
-        
-        <!-- Provenance -->
-        <el-card  style="width: 40%; height:1000px;">
-            <div> Provenance </div>
         </el-card>
 
         <!-- Chart -->
-        <el-card  style="width: 40%">
-            <radar-chart :chart-data="chartData" :options="options"></radar-chart>
+        <el-card  class="el-card-chart" style="width: 440px">
+            <radar-chart :chart-data="chartData" :options="options" style="background:white; padding:5px 20px;"></radar-chart>
         </el-card>
 
-        <!-- Maneki Power -->
-        <el-card  style="width: 40%">
-            <el-table  :data="NFT.attributes" stripe>
-                <el-table-column prop="trait_type" label="MANEKI POWER" width="250"> </el-table-column>
-                <el-table-column prop="value" label="value #" width="250"> </el-table-column>      
+        <!-- Certificate -->
+        <el-card style="width:440px">
+            <el-table  :data="certificate" stripe>
+                <el-table-column prop="trait_type" label="Birth Certification" width="170"> </el-table-column>
+                <el-table-column prop="value" > </el-table-column>      
             </el-table>
+            <div style="background-color:white">
+            <el-link :href=NFT.txURL target="_blank" class="linkVerify" type="primary" style="background-color:white; text-align:center; margin:0 auto; ">Verify Certificate</el-link>
+            </div>
+        <div style="clear:both;"></div>
         </el-card>
 
- 
+
+
+        <div style="clear:both;"></div>
+        </div>
+
+        
+  
 
 
 
-       
+
+        <!-- Approve to sell -->
+        <el-dialog  :visible.sync="dialog.approveToSell" >  
+            <div class="dialog-input-wrap">       
+   
+                <div class="dialog-content">
+                    <div style="color:white; font-size:1.8em; padding-top:100px; padding-left:80px;padding-bottom:20px; "> 
+                        <span style="color:yellow; font-size:0.7em;">販売のために公開</span> <br> Publish for sale
+                    </div>
+            
+                    <el-form :model="sellApproveForm">
+                        <el-form-item  style="width:350px; margin: 0 auto; height:200px">
+                        <el-select v-model="sellApproveForm.tokenID" placeholder="Select NFT">
+                            <el-option :key="'neko-'+sellApproveForm.tokenID" :label="'招き猫 #'+sellForm.tokenID" :value="sellForm.tokenID"></el-option>
+                        </el-select>
+                        </el-form-item>
+                    </el-form>
+                </div>
+
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialog.approveToSell = false">Cancel</el-button>
+                <el-button type="primary" @click="approveToSell()"> Approve </el-button>
+            </div>
+            </div>
+        </el-dialog>
+        
 
 
+        <!-- Want to sell -->
+        <el-dialog  :visible.sync="dialog.wantToSell" :close-on-click-modal="false" >
+            <div class="dialog-input-wrap"> 
+
+                <div class="dialog-content" style="height:350px;">
+                    <div style="color:white; font-size:1.8em; padding-top:5px; padding-left:80px;padding-bottom:20px; "> 
+                        <span style="color:yellow; font-size:0.7em;">オークションオファー</span> <br> Auction offer
+                    </div>
+
+                    <el-form :model="sellForm" :rules="sellRules" label-width="140px" >
+
+                        <el-form-item label="Meow" style=" display:none;  margin: 0 auto; height:60px">
+                        <el-select v-model="sellForm.tokenID" placeholder="Select NFT">
+                            <el-option :key="'neko-'+sellForm.tokenID" :label="'招き猫 #'+sellForm.tokenID" :value="sellForm.tokenID"></el-option>
+                        </el-select>
+                        </el-form-item>
+
+
+                        <el-form-item  label="Accept"  style=" margin: 0 auto; height:60px; ">
+                            <el-select v-model="sellForm.paymentToken" placeholder="Pay by">
+                                <el-option :key="'CFX'" :label="'CFX'" :value="'cfx:aathhv7a493sc2r6p5g5se7ehjpxsrtcy6863hna4v'"></el-option>
+                                <!-- <el-option label="USDT" value="cfxtest:acepe88unk7fvs18436178up33hb4zkuf62a9dk1gv"></el-option> -->
+                                <!-- <el-option label="NEKO" value="cfxtest:aca9u5eu3zvmjv6gdudvf21g9uj2cm60upya76k4e4"></el-option> -->
+                            </el-select>
+                        </el-form-item>
+
+
+                        <el-form-item  prop="startPrice" label="Highest price"  style="width:width:400px; margin: 0 auto; height:60px;">
+                            <el-input-number size="medium" v-model="sellForm.startPrice"></el-input-number>
+                            <!--el-input v-model="sellForm.startPrice" placeholder="Highest price" ></el-input> -->
+                        </el-form-item>
+
+                        <el-form-item label="Lowest price"  style="width:width:400px; margin: 0 auto; height:60px; ">
+
+                            <el-input-number size="medium" v-model="sellForm.endPrice" :disabled="true"></el-input-number>
+                            <!-- <el-input v-model="sellForm.endPrice" placeholder="Lowest price" ></el-input> -->
+                        </el-form-item>
+
+                        <el-form-item  label="Duration (hour)"  style="width:width:400px; margin: 0 auto; height:60px;">
+                            <el-input-number size="medium" v-model="sellForm.duration" :disabled="true"></el-input-number>
+                            <!--<el-input v-model="sellForm.duration" placeholder="Duration (Hour)" value="24"></el-input>-->
+                        </el-form-item>
+                    </el-form>
+                </div>
+
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="dialog.wantToSell = false">Cancel</el-button>
+                        <el-button type="primary" @click="wantToSell()"> Approve </el-button>
+                    </div>
+            </div>
+        </el-dialog>
+
+
+        <!-- Approving -->
+        <el-dialog  :visible.sync="dialog.approving" :close-on-click-modal="false" >
+            <div class="dialog-input-wrap" style="color:white;">
+                <div class="dialog-content">
+                    <div style="color:white; font-size:1.8em; padding-top:150px; width:350px; margin:0 auto; "> 
+                        <span style="color:yellow; font-size:0.7em;">承認待ち</span> <br> Waiting for approval 
+                        <br> to publish MEOW 猫 #{{NFT.id}}
+                    </div>
+                </div>
+            </div>
+        </el-dialog>
+
+
+        <!-- Publishing -->
+        <el-dialog  :visible.sync="dialog.publishing" :close-on-click-modal="false" >
+            <div class="dialog-input-wrap">
+                <div class="dialog-content">
+                    <div style="color:white; font-size:1.8em; padding-top:150px; width:350px; margin:0 auto; "> 
+                        <span style="color:yellow; font-size:0.7em;">出版</span> <br> Publishing MEOW 猫 #{{NFT.id}}
+                    </div>
+                </div>
+            </div>
+        </el-dialog>
+
+
+        <!-- Published -->
+        <el-dialog  :visible.sync="dialog.successPublish" :close-on-click-modal="false" >
+            <div class="dialog-input-wrap">
+                <div class="dialog-content">
+                    <div style="color:white; font-size:1.8em; padding-top:120px; width:350px; margin:0 auto; "> 
+                        <span style="color:yellow; font-size:0.7em;">正常に公開</span> <br> Publish successfully
+                        <br> MEOW 猫 #{{NFT.id}}
+                    </div>
+                    <div style="width:350px; margin:0 auto; padding-bottom:30px;"> Blockchain Tx : <br>
+                        <el-link :href=NFT.TxLogURL target="_blank" class="linkVerify" type="primary">{{ NFT.TxLog }}</el-link>
+                    </div>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="$router.push('/wallet')"> Sell more </el-button>
+                    <el-button type="primary" @click="$router.push('/auction/' + NFT.id + '/0x0/')"> View auction</el-button>
+                </div>
+            </div>
+        </el-dialog>
+
+
+        <!-- Send as gift -->
+        <el-dialog  :visible.sync="dialog.sendGift" >
+            <div class="dialog-input-wrap">
+                <h2 style="color:white;"> Send to a friend </h2>
+            
+
+            <el-form :model="giftForm">
+                <el-form-item  >
+                <el-select v-model="giftForm.tokenID" placeholder="Select NFT">
+                    <el-option :key="'neko-'+giftForm.tokenID" :label="'招き猫 #'+giftForm.tokenID" :value="giftForm.tokenID"></el-option>
+                </el-select>
+                </el-form-item>
+
+                <el-form-item >
+                <el-input v-model="giftForm.receiverAddr" placeholder="Conflux wallet cfx:aapn..."></el-input>
+                </el-form-item>
+
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialog.sendGift = false">Cancel</el-button>
+                <el-button type="primary" @click="approveSendGift()"> Approve </el-button>
+            </div>
+            </div>
+        </el-dialog>
 
     </div>
 </template>
 
 <script>
-import RadarChart from '../charts/RadarChart';
-
-
-import getWeb3 from '../web3/web3';
 
 import abi_collectible from '../web3/abi_collectible';
-const contract_collectible = '0xDA01f83Fc3483Df018034af5fe8aDa75373162aF';
+import abi_exchange from '../web3/abi_exchange';
+// Contract : ERC20 - $NEKO
+import abi_neko from '../web3/abi_neko';
+
+import RadarChart from '../charts/RadarChart';
+
+import ConfluxPortalOnboarding from 'conflux-portal-onboarding'
+    
+    const { Conflux} = require('js-conflux-sdk');
+
+    // In browser: const Conflux = window.TreeGraph.Conflux;
+
+    const conflux = new Conflux({
+        url: "https://test.confluxrpc.com",
+        networkId: 1
+        });
 
 
-// Contract : Collectibles Paymnet
-import abi_payment from '../web3/abi_payment';
-const contract_payment = '0xB98ACE202eEf57896263CfC89257A78a9C6B29cF';
+    conflux.provider = window.conflux
+
+    //connect Collectibles Contract 
+    const contract_collectibles =  conflux.Contract({abi:abi_collectible, address:'cfxtest:acgrtg0ncb3jmj8621f8fa78bhbxrg38kazk4n25uw'});
+    
+    const contract_marketplace = conflux.Contract({abi:abi_exchange, address:'cfxtest:acg512fh0g276nar1n2te23js1808hzrcp2vdc2d2e'});
+
+    //connect Neko Contract
+    const contract_neko = conflux.Contract({abi:abi_neko, address:'cfxtest:aca9u5eu3zvmjv6gdudvf21g9uj2cm60upya76k4e4'});
+
+
+
+    const forwarderOrigin = 'http://localhost:8080'
+    const onboarding = new ConfluxPortalOnboarding({ forwarderOrigin })
+    //onboarding.startOnboarding()
 
 
 export default {
+    name: 'Maneki-Meow',
+    metaInfo() {
+        return {
+        title: 'Maneki-Meow #'+ this.$route.params.id, 
+        }
+    },
     components: {
         RadarChart
     },
     data(){
         return{
+            sellRules: {
+                    startPrice: [
+                        {type: 'number', message: 'Must be number', trigger: 'blur'},
+                        { min: 1, max: 999, message: 'Limit to max 1000 in testnet', trigger: 'blur' }
+                    ],
+            }, 
+            accountNekoBalance:0,
+            accountCFXBalance:0,
+            accountMeowBalance:0,
             contractInstance:null,
             account:null,
             contract :{
                 collectibles:null,
                 payment:null,
+            },
+            display :{
+                isConnect : false,
             },
             newNFT : {
                 id      : '',
@@ -104,6 +356,7 @@ export default {
                 wish    : ''
             },
             NFT: {
+                id : null,
                 transactionHash : null,
                 txURL     : null,
                 valuation : null,
@@ -114,11 +367,14 @@ export default {
                 art_dna:null,
                 image:null,
                 wish:null,
+                piggyBank : null,
                 attributes: [{
                     trait_type:null,
                     value:null,
                     display_type:null
-                }]
+                }],
+                TxLog : null,
+                TxLogURL : null
             },
             energies : {
                 wealth      : 0,
@@ -128,7 +384,23 @@ export default {
                 health      : 0
             },
             // Radarchart Setting and data
-            chartData : null,
+            chartData : {
+                labels: [ "Wealth",	"Opportunity","Relationship", "Wisdom",	"Health"],
+                datasets: [
+                {
+                    label: 'Maneki Power',
+                    borderWidth: 0.5,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 99, 132,0.2)',
+                    borderColor: 'rgb(255, 99, 132,0.2)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 99, 132)',
+                    data: [0, 0, 0, 0, 0]
+                },
+                ]
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -142,51 +414,124 @@ export default {
             },
             valuation : [],
             certificate : [],
+            dialog :{
+                approveToExchange : false,
+                offerForm : false,
+                sendGift : false,
+                wantToSell : false,
+                approveToSell : false,
+                publishing : false,
+                successPublish : false,
+                approving : false
+            },
+            giftForm : {
+                tokenID: '',
+                receiverAddr:''
+            },
+            sellApproveForm : {
+                tokenID: '',
+            },
+            sellForm : {
+                sellerAddr :'',
+                tokenID: '',
+                paymentToken : 'cfx:aathhv7a493sc2r6p5g5se7ehjpxsrtcy6863hna4v',
+                startPrice : 90,
+                endPrice : 10,
+                duration :6,
+            },
+            formLabelWidth : '120px',
         }
     },
     mounted() {
-        this.getMetadata(this.$route.params.id);
-        if (typeof web3 !== 'undefined') {
-    
-            console.log('Metamask is installed!');
 
-            getWeb3().then((res) => {
-                this.web3 = res;
-
-                //connect Contracts Collectibles
-                this.contract.collectibles = new this.web3.eth.Contract(abi_collectible, contract_collectible);
-                this.contract.payment = new this.web3.eth.Contract(abi_payment, contract_payment);
-   
-                //get current signed wallet address
-                this.web3.eth.getAccounts().then((accounts) => {
-                    [this.account] = accounts;
-                    this.getBNBPrice('BNBUSDT');
-                    this.getBNBPrice('CAKEUSDT');
-                    this.getBNBPrice('BAKEUSDT');
-
-                    // get transaction hash
-                    //this.gettransactionHash();
-
-
-                }).catch((err) => {
-                    console.log(err, 'err!!');
-                });
-            });
+        if (typeof window.conflux !== "undefined") {
+            console.log('Conflux portal is installed!');
+            this.updateData();
         } else {
-            //alert('Wallet not connected! Kindly use Coinbase Wallet or Google Chrome with Metamask Plugin');
-
+            console.log('Please install Conflux portal, go to confluxnetwork.org');
         }
 
+
+        //this.updateData();
+        //this.getMetadata(this.$route.params.id);
+        //this.getNFTDetails(this.$route.params.id);
+        //this.checkWalletBalance();
+        
     },
     methods :{
-        popWish(name, msg) {
-            this.$notify.success({
-                title: msg,
-                message: name,
-                showClose: false,
-                duration: 50000,
-                position: 'bottom-right'
-            });
+
+        async updateData(){
+            await window.conflux.request({method: "cfx_requestAccounts"});
+
+            if (typeof window.conflux !== "undefined"){
+                console.log('Conflux Portal is installed!');
+
+            try {
+
+                const cfx = window["conflux"]
+                const accounts = await cfx.request({method: "cfx_requestAccounts"})
+                this.account = accounts[0]
+                this.shortenAccount = accounts[0].substring(0, 10) + '...' + accounts[0].substring(44, 50)
+                this.display.isConnect = true;
+
+                console.log('Connect Accounts :', this.account);
+
+                this.getMetadata(this.$route.params.id);
+                this.getNFTDetails(this.$route.params.id);
+                this.checkWalletBalance();
+
+            } catch (error) {
+                if (error.code === 4001) {
+                    // EIP 1193 userRejectedRequest error
+                    console.log("Please connect to ConfluxPortal.")
+                } else {
+                    console.error(error)
+                }
+            }
+            }
+
+
+        },
+        async checkWalletBalance(){
+                // NEKO Balance
+                await contract_neko.balanceOf(this.account).then((res) => {
+                    this.accountNekoBalance = (parseInt(res.toString()/1e18));
+                    console.log('Balance $NEKO:', (parseInt(res.toString()/1e18)));
+                }).catch((err) => {
+                    console.log(err, 'err');
+                });
+
+                // CFX Balance
+                await conflux.getBalance(this.account).then((res) => {
+                    this.accountCFXBalance = (res.toString()/1e18).toFixed(5);
+                }).catch((err) => {
+                    console.log(err, 'err');
+                });
+
+                // Total NFT Owned 
+                await contract_collectibles.balanceOf(this.account).call({
+                    from: this.account,
+                }).then((res) => {
+                    this.accountMeowBalance = parseInt(res);
+                }).catch((err) => {
+                    console.log(err, 'err');
+                });
+
+
+        },
+
+
+        async updateButton(){        
+            if (!ConfluxPortalOnboarding.isConfluxPortalInstalled()) {
+                console.log ('Click here to install ConfluxPortal!')
+                onboarding.startOnboarding()
+                
+            } else if (this.accounts && this.accounts.length > 0) {
+                console.log('Connected :', this.accounts)
+            } else {
+                console.log('Connect')
+                window.conflux.request({method: "cfx_requestAccounts"})
+            }
         },
         fillData (a,b,c,d,e) {
 
@@ -199,8 +544,8 @@ export default {
                     label: 'Maneki Power',
                     borderWidth: 0.5,
                     fill: true,
-                    backgroundColor: 'rgba(255, 99, 132,0.5)',
-                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132,0.2)',
+                    borderColor: 'rgb(255, 99, 132,0.2)',
                     pointBackgroundColor: 'rgb(255, 99, 132)',
                     pointBorderColor: '#fff',
                     pointHoverBackgroundColor: '#fff',
@@ -308,15 +653,32 @@ export default {
 
 
         },
-        async getBNBPrice(symbol){
-            const axios = require('axios');
-            await axios.get('https://api.binance.com/api/v3/ticker/price?symbol='+symbol)
-            .then((res) => {
-                console.log ('BNB  :',res.data);
-                //import data form metadata
-            }).catch((err) => {
-                console.log(err, 'err');
-            });    
+        async getNFTDetails(_id){
+
+            contract_collectibles.Nekos(_id).call().then((res) => {
+
+                this.NFT.id           = _id;
+                this.NFT.power        = res[0]; 
+                this.NFT.DNA          = res[1];
+                this.NFT.piggyBank    = parseInt(res[4].toString()/10**18).toLocaleString() ;
+
+
+                if (res[2].toString()!=0){
+                    this.NFT.refCount        = res[2].toString();
+                } else {
+                    this.NFT.refCount        = null;
+                }
+
+
+                if (res[3].toString()!=0){
+                    this.NFT.gamma        = res[3].toString();
+                } else {
+                    this.NFT.gamma        = null;
+                }
+
+                console.log('NFT details : ',res[4].toString()/10**18);
+                
+            })    
 
         },
         async getMetadata(id){
@@ -325,10 +687,10 @@ export default {
             .then((res) => {
                 console.log ('metadata :',res.data);
                 //import data form metadata
+                this.NFT.id = id;
                 this.NFT.transactionHash = res.data.transactionHash;
-                this.NFT.txURL  = 'https://testnet.bscscan.com/tx/'+ res.data.transactionHash;
+                this.NFT.txURL  = 'https://testnet.confluxscan.io/transaction/'+ res.data.transactionHash;
                 this.NFT.name = res.data.name;
-                this.NFT.id = res.data.id;
                 this.NFT.guardian = res.data.guardian;
                 this.NFT.gamma = res.data.gamma;
                 this.NFT.description = res.data.description;
@@ -349,13 +711,11 @@ export default {
                 //make valuation
                 this.getValuation(res.data.attributes[3].value.toString().replace(',', ''));
 
-                //pop out wish message
-                this.popWish(this.NFT.name +' bring this wish come true!', this.NFT.description);
 
                 //birth certification 
                 this.getCertificate();
 
-                console.log('chartData wealth: ', res.data.attributes[6].value);
+                console.log('Guardian Metadata', this.NFT);
 
             }).catch((err) => {
                 console.log(err, 'err');
@@ -363,8 +723,10 @@ export default {
         },
         imageLoadError () {
             console.log('Image failed to load');
-            this.generateNewNFT(this.$route.params.id,);
+            //this.generateNewNFT(this.$route.params.id,);
         },
+
+
         async generateNewNFT(_id){
 
             // get transactionHash
@@ -413,7 +775,135 @@ export default {
                 console.log('api data 2 : ', res2);
                 //this.$router.go();
         },
+        sendGift(_tokenID){
+            console.log('send gift activated')
+            this.giftForm.tokenID = _tokenID;
+            this.dialog.sendGift = true;
+        },
+        openApproveSellDialog(_tokenID){
+            console.log('Approve to sell activated')
+            this.sellApproveForm.tokenID =_tokenID;
+            this.sellForm.tokenID = _tokenID;
+            this.dialog.approveToSell = true;
+        },
+        async approveToSell(){
+            console.log('Approve for selling')
+            // sell approve able to transfer to marketplace, via COLLECTIBLE contract
 
+            this.dialog.approveToSell = false;
+            this.dialog.approving = true;
+
+            await window.conflux.request({method: "cfx_requestAccounts"}).then((currentWalletAddr) => {
+
+                console.log('Connect Accounts :', currentWalletAddr);
+                console.log('Marketplace addr : ', contract_marketplace.address);
+
+            
+                contract_collectibles.approve(contract_marketplace.address, this.sellApproveForm.tokenID).sendTransaction({
+                        from: currentWalletAddr
+                    }).executed().then((res) => {
+
+                    console.log('Approved ',res);
+
+                    this.dialog.approving = false;
+                    this.dialog.wantToSell = true;
+                    this.$message.success('approve marketplace to create your listing');
+
+
+                }).catch((err) => {
+                    console.log(err, 'err!!');
+                    this.$message.error("Sending Failed");
+                });
+                
+            });
+
+        },
+        openWantToSellDialog (_tokenID) {
+            console.log('open want to sell dialog')
+            this.dialog.wantToSell = true;
+            this.sellForm.tokenID = _tokenID;
+        },
+        async wantToSell () {
+            console.log('Want to sell activated')
+
+
+  
+      
+            this.dialog.wantToSell = false;
+            this.dialog.publishing = true;
+
+            // sell approve able to transfer to marketplace, via COLLECTIBLE contract
+            await window.conflux.request({method: "cfx_requestAccounts"}).then((currentWalletAddr) => {
+
+                console.log('Connect Accounts :', currentWalletAddr);
+                console.log('collectible addr : ', contract_marketplace.address);
+
+            
+            
+                // tokenId , _paymentToken, _startPrice, _endPrice, _duration
+                contract_marketplace.createAuction(
+                    this.sellForm.tokenID,
+                    this.sellForm.paymentToken,
+                    this.sellForm.startPrice*(10**18),
+                    this.sellForm.endPrice*(10**18),
+                    this.sellForm.duration*3600,
+                    ).sendTransaction({
+                        from: currentWalletAddr,
+                        gas: '0x29810', //150000
+                        gasPrice: '0x1388', //5000
+                        storageLimit: '0x306', //774
+                        }).executed().then((res) => {
+
+                            console.log('Auction Created ',res);
+                            this.NFT.TxLog = res['transactionHash'].substring(0, 15) + '...' + res['transactionHash'].substring(60, 66)
+                            this.NFT.TxLogURL = 'https://testnet.confluxscan.io/transaction/'+ res['transactionHash']
+
+                            console.log('tx hash :', this.NFT.TxLog
+                            )
+                            
+                            this.$message.success('Listed created');
+
+                            this.dialog.publishing = false;
+                            this.dialog.successPublish = true;
+
+                        })
+
+
+            });
+
+ 
+            // return : create Auction at MARKETPLACE contract
+            
+        },
+        async approveSendGift (){   
+
+            // No required to pre approve() only make transfer
+            console.log('sender', this.account);
+            console.log('reciever', this.giftForm.receiverAddr);
+
+            await window.conflux.request({method: "cfx_requestAccounts"}).then((currentWalletAddr) => {
+
+                console.log('Connect Accounts :', currentWalletAddr);
+                this.$message.success('Start Minting');
+            
+                contract_collectibles.sendAsGift(this.giftForm.receiverAddr, this.giftForm.tokenID).sendTransaction({
+                    from: currentWalletAddr,
+                    //from: this.account,
+                    gas: '0x186A0', //100,000
+                    gasPrice: '0x7D0', //2000
+                    storageLimit: '0x7D0', //2000
+                }).confirmed().then((res) => {
+                    console.log('approve gift sending',res);
+                    this.dialog.sendGift = false;
+                }).catch((err) => {
+                    console.log(err, 'err!!');
+                    this.$message.error("Sending Failed");
+                });
+                
+            });
+ 
+
+        },
      
     }
 }
@@ -421,15 +911,151 @@ export default {
 </script>
 
 <style scoped>
+.main-container{
+}
+.sub-container-gaurdian-details, .sub-container-tx-details{
+    padding-top: 50px;
+    width:1020px;
+    margin: 0 auto;
+    padding-bottom: 30px;
+}
 .nft-image {
+    padding:0px;
+    margin:0px;
     width:400px;
     height: 400px;
 }
 .el-card {
     float:left;
+    margin-left: 20px;
+    margin-bottom: 30px;
+    background:rgba(0, 0, 0, .4); 
+    border: none;
+}
+.el-card-chart {
+    float:left;
+    margin-left: 20px;
+    margin-bottom: 30px;
+    background:rgba(0, 0, 0, .4); 
+    border: none;
+}
+.el-card-wish{
+    background-image: url("../../src/assets/images/icon-wish.png");
+    background-repeat: no-repeat;
+    background-position: top left; 
+    padding-left:60px;
+    color:white; 
+    font-size:1.2em;
+    min-height: 100px;
+}
+.el-card-name {
+    background-image: url("../../src/assets/images/icon-meow.png");
+    background-repeat: no-repeat;
+    background-position: top left; 
+    padding-left:60px;
+    color:white; 
+    font-size:1em;
+    min-height: 100px;
+}
+.el-card-neko {
+    background-image: url("../../src/assets/images/icon-neko.png");
+    background-repeat: no-repeat;
+    background-position: top left; 
+    padding-left:60px;
+    color:white; 
+    min-height: 100px;
+    font-size: 2em;
+    
+}
+
+.dialog-content{
+    height:300px;
+}
+.dialog-footer {
+    text-align: center;
+}
+.el-card-meta {
+    background:rgba(0, 0, 0, .4); 
+}
+.el-table-meta {
+    background-color: none;
 }
 .linkVerify {
     padding: 10px;
+    margin:0 auto;
+    text-align: right;
+}
+
+.dialog-input-wrap{
+    width:500px; 
+    height:420px;
+    margin:0 auto; 
+    padding-bottom:15px; 
+    padding-top:20px; 
+    padding-left:20px; 
+    padding-right:20px; 
+    border:1px solid #000;  
+    background:rgba(0, 0, 99, 0.8);  
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+.wallet-connection{
+    width: 460px;
+    text-align: right;
+    color: #c6c6c6;
     float:right;
+    margin-right:30px;
+}
+.token-wrap{
+    width: 460px;
+    height: 30px;
+    padding:20px;
+    margin-top:-20px;
+    background: #3f3f3f;
+    border-radius: 0 0 10px 10px;
+    background:rgba(0, 0, 0, .4); 
+    border:solid 1px #0086ff;
+}
+.cfx-balance {
+    text-align: left;
+    background-image: url("../../src/assets/images/icon-cfx.png");
+    background-repeat: no-repeat;
+    background-position: top left; 
+    background-size : 23px 23px;
+    padding:2px;
+    padding-left:30px;
+    padding-right:5px;
+    min-height: 27px;
+    width:140px;
+    float:left;
+    color:white;
+}
+.neko-balance {
+    text-align: left;
+    background-image: url("../../src/assets/images/icon-neko.png");
+    background-repeat: no-repeat;
+    background-position: top left; 
+    background-size : 23px 23px;
+    padding:2px;
+    padding-left:30px;
+    padding-right:5px;
+    min-height: 27px;
+    width:140px;
+    color:#fcee21;
+    float:left;
+}
+.meow-balance {
+    text-align: left;
+    background-image: url("../../src/assets/images/icon-meow.png");
+    background-repeat: no-repeat;
+    background-position: top left; 
+    background-size : 23px 23px;
+    padding:2px;
+    padding-left:30px;
+    padding-right:5px;
+    min-height: 27px;
+    width:60px;
+    color:#fcee21;
+    float:left;
 }
 </style>
